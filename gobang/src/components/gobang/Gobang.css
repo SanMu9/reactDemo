@@ -5,6 +5,10 @@ html,body{
     justify-content: center;
     align-items: center;
 }
+.info-tip{
+    /* padding: 0 10px; */
+    text-align: center;
+}
 .board{
     margin: 20px;
     box-sizing: border-box;
@@ -14,6 +18,7 @@ html,body{
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
     /* outline: 1px dashed #fff; */
 }
 .square-row{
@@ -24,4 +29,23 @@ html,body{
     width: 80%;
     height: 80%;
     border-radius: 50%;
+}
+.no-piece{
+    display: none;
+}
+.white-piece{
+    background: #fff;
+    display: block;
+}
+.black-piece{
+    background: #000;
+    display: block;
+}
+.white-piece-hover{
+    background: rgba(255, 255, 255, 0.4);
+    display: block;
+}
+.black-piece-hover{
+    background: rgba(0, 0, 0, 0.4);
+    display: block;
 }

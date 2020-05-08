@@ -99,8 +99,7 @@ class Game extends React.Component {
         </li>
       );
     });
-    console.log(moves)
-
+    console.log("render")
     let status;
     if (winner) {
       status = "Winner: " + winner;

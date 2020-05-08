@@ -22,10 +22,12 @@ class Board extends React.Component{
         this.state = {
             sideLength:sideLength,
             blockWidth:sideLength/15,
+            bIsNext:true,
             //白子 'w'  黑子 'b'
             squares:Array(15).fill(null).map((val,idx) => {
                 return new Array(15).fill(null)
-            })
+            }),
+            renderCount:0
         };
         // this.initCanvas = this.initCanvas.bind(this)
     }
@@ -60,10 +62,64 @@ class Board extends React.Component{
         // ctx.strokeRect(0,0,sideLength-1,sideLength-1)
     }
 
+    handleMouseOver(ev,lineIdx,colIdx){
+        let square = this.state.squares[lineIdx][colIdx];
+        if(square!=null){
+            return
+        }
+        let bIsNext = this.state.bIsNext,
+            tar = ev.currentTarget,
+            piece = tar.firstElementChild,
+            className = bIsNext?"black-piece-hover":"white-piece-hover";
+        piece.classList.add(className);
+        // tar.classList.remove
+
+        // console.log(tar.firstElementChild)
+    }
+    handleMouseOut(ev,lineIdx,colIdx){
+        let square = this.state.squares[lineIdx][colIdx];
+        if(square!=null){
+            return
+        }
+        let bIsNext = this.state.bIsNext,
+            tar = ev.currentTarget,
+            piece = tar.firstElementChild,
+            className = bIsNext?"black-piece-hover":"white-piece-hover";
+        piece.classList.remove(className);
+    }
+    handleClick(ev,lineIdx,colIdx){
+        let square = this.state.squares[lineIdx][colIdx];
+        if(square!=null){
+            return
+        }
+        let bIsNext = this.state.bIsNext,
+            renderCount = this.state.renderCount,
+            squares = multidimensionArrayDeepCopy(this.state.squares),
+            piece = ev.currentTarget.firstElementChild,
+            val = bIsNext?"b":"w",
+            className = bIsNext?"black-piece":"white-piece";
+        squares[lineIdx][colIdx] = val;
+        piece.classList.add(className);
+
+        this.setState({
+            squares:squares,
+            bIsNext:!bIsNext,
+            renderCount:renderCount+1
+        })
+        
+    }
+
     // componentWillMount(){
     // }
     componentDidMount(){
         this.initCanvas();
+    }
+    shouldComponentUpdate(nextProps,nextState){
+        console.log(nextState)
+        if(this.state.renderCount === nextState.renderCount){
+            return false
+        }
+        return true
     }
 
     // componentDidUpdate(){}
@@ -74,37 +130,51 @@ class Board extends React.Component{
         const domArray = squares.map((arr,lineIdx) => {
             let square = arr.map((val,colIdx) => {
                 return (
-                    <div key={colIdx} className="square" style={{flex:1,height:"100%"}} colIdx={colIdx} lineIdx={lineIdx}>
-                        <span className="chess-piece" style={{background:val=="w"?"rgba(255,255,255,0.4)":"rgba(0,0,0,0.4)"}}></span>
+                    <div key={colIdx} className="square" style={{flex:1,height:"100%"}} 
+                        onMouseOver={(ev)=>this.handleMouseOver(ev,lineIdx,colIdx)}
+                        onMouseOut={(ev) => this.handleMouseOut(ev,lineIdx,colIdx)}
+                        onClick={(ev) => this.handleClick(ev,lineIdx,colIdx)}
+                    >
+                        <span className={["chess-piece",val==='w'?"white-piece":null,val==='b'?"black-piece":null,val===null?"no-piece":null].join(" ")}></span>
                     </div>
                 )
             })
-            console.log(square)
             return (
                 <div className="square-row" key={lineIdx} style={{height:this.state.blockWidth,width:this.state.sideLength}}>
                     {square}
                 </div>
             )
         })
-      
+
+        const tip = ""
+      console.log("render")
 
         return (
-            <div className="board" style={{width:this.state.sideLength+"px",height:this.state.sideLength+"px"}}>
-                <canvas id="goband-board-canvas"></canvas>
-                <div style={{width:this.state.sideLength+"px",height:this.state.sideLength+"px",position:'absolute',top:0,left:0}}>
-                    {domArray}
+            <div>
+                <p className="info-tip">Next Player：{this.state.bIsNext?"黑棋":"白棋"}</p>
+                <div className="board" style={{width:this.state.sideLength+"px",height:this.state.sideLength+"px"}}>
+                    <canvas id="goband-board-canvas"></canvas>
+                    <div style={{width:this.state.sideLength+"px",height:this.state.sideLength+"px",position:'absolute',top:0,left:0}}>
+                        {domArray}
+                    </div>
                 </div>
             </div>
+          
         )
     }
 }
 
-class GoBang extends React.Component{
-    render() {
-        return (
-            <Board />
-        )
-    }
+// class GoBang extends React.Component{
+//     render() {
+//         return (
+//             <Board />
+//         )
+//     }
+// }
+function GoBang(){
+    return (
+        <Board></Board>
+    )
 }
 
 export default GoBang;

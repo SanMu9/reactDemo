@@ -6,10 +6,10 @@ import GoBang from './components/gobang/Gobang';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <GoBang />
-    {/* <App></App> */}
-  </React.StrictMode>,
+  // <React.StrictMode>
+    <GoBang />,
+    // {/* <App></App> */}
+  // </React.StrictMode>,
   document.getElementById('root')
 );
 

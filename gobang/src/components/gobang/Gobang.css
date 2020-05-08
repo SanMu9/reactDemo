@@ -1,0 +1,27 @@
+html,body{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.board{
+    margin: 20px;
+    box-sizing: border-box;
+    position: relative;
+}
+.square{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* outline: 1px dashed #fff; */
+}
+.square-row{
+    display: flex;
+    /* justify-content: center; */
+}
+.square-row .chess-piece{
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+}

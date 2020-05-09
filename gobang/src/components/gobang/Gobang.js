@@ -27,7 +27,8 @@ class Board extends React.Component{
             squares:Array(15).fill(null).map((val,idx) => {
                 return new Array(15).fill(null)
             }),
-            renderCount:0
+            renderCount:0,
+            winner:null
         };
         // this.initCanvas = this.initCanvas.bind(this)
     }
@@ -88,8 +89,9 @@ class Board extends React.Component{
         piece.classList.remove(className);
     }
     handleClick(ev,lineIdx,colIdx){
-        let square = this.state.squares[lineIdx][colIdx];
-        if(square!=null){
+        let square = this.state.squares[lineIdx][colIdx],
+            w = this.state.winner;
+        if(square!=null||w){
             return
         }
         let bIsNext = this.state.bIsNext,
@@ -101,12 +103,15 @@ class Board extends React.Component{
         squares[lineIdx][colIdx] = val;
         piece.classList.add(className);
 
+        const winner = calculateWinner(squares,lineIdx,colIdx);
+
         this.setState({
             squares:squares,
             bIsNext:!bIsNext,
-            renderCount:renderCount+1
+            renderCount:renderCount+1,
+            winner:winner
         })
-        
+
     }
 
     // componentWillMount(){
@@ -146,12 +151,21 @@ class Board extends React.Component{
             )
         })
 
-        const tip = ""
+        const winner = this.state.winner;
+        let status;
+        if(winner){
+            status="胜利方："+(winner === 'b'?"黑子":"白子")
+        }else{
+            status = "Next Player："+(this.state.bIsNext?"黑子":"白子")
+        }
+
+
+    // const tip = ""
       console.log("render")
 
         return (
             <div>
-                <p className="info-tip">Next Player：{this.state.bIsNext?"黑棋":"白棋"}</p>
+                <p className="info-tip">{status}</p>
                 <div className="board" style={{width:this.state.sideLength+"px",height:this.state.sideLength+"px"}}>
                     <canvas id="goband-board-canvas"></canvas>
                     <div style={{width:this.state.sideLength+"px",height:this.state.sideLength+"px",position:'absolute',top:0,left:0}}>
@@ -159,9 +173,47 @@ class Board extends React.Component{
                     </div>
                 </div>
             </div>
-          
         )
     }
+}
+
+function calculateWinner(squares,lineIdx,colIdx){
+    // 五子连线情况其余四子与当前子的行列关系
+    const cases = [
+        [[-4,-4],[-3,-3],[-2,-2],[-1,-1]],
+        [[-3,-3],[-2,-2],[-1,-1],[1,1]],
+        [[-2,-2],[-1,-1],[1,1],[2,2]],
+        [[-1,-1],[1,1],[2,2],[3,3]],
+        [[1,1],[2,2],[3,3],[4,4]],
+        [[4,-4],[3,-3],[2,-2],[1,-1]],
+        [[3,-3],[2,-2],[1,-1],[-1,1]],
+        [[2,-2],[1,-1],[-1,1],[-2,2]],
+        [[1,-1],[-1,1],[-2,2],[-3,3]],
+        [[-1,1],[-2,2],[-3,3],[-4,4]],
+        [[0,-4],[0,-3],[0,-2],[0,-1]],
+        [[0,-3],[0,-2],[0,-1],[0,1]],
+        [[0,-2],[0,-1],[0,1],[0,2]],
+        [[0,-1],[0,1],[0,2],[0,3]],
+        [[0,1],[0,2],[0,3],[0,4]],
+        [[-4,0],[-3,0],[-2,0],[-1,0]],
+        [[-3,0],[-2,0],[-1,0],[1,0]],
+        [[-2,0],[-1,0],[1,0],[2,0]],
+        [[-1,0],[1,0],[2,0],[3,0]],
+        [[1,0],[2,0],[3,0],[4,0]],
+    ];
+    let len = cases.length,
+        val = squares[lineIdx][colIdx];
+    for(let i=0;i<len;i++){
+        const [a,b,c,d] = cases[i];
+        const val1 = squares[lineIdx+a[0]]?squares[lineIdx+a[0]][colIdx+a[1]]:null;
+        const val2 = squares[lineIdx+b[0]]?squares[lineIdx+b[0]][colIdx+b[1]]:null;
+        const val3 = squares[lineIdx+c[0]]?squares[lineIdx+c[0]][colIdx+c[1]]:null;
+        const val4 = squares[lineIdx+d[0]]?squares[lineIdx+d[0]][colIdx+d[1]]:null;
+        if(val1&&val1===val&&val1 === val2&&val1 ===val3 &&val1 === val4){
+            return val
+        }
+    }
+    return null;
 }
 
 // class GoBang extends React.Component{

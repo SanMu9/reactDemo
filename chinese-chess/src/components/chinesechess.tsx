@@ -1,11 +1,23 @@
 import React from 'react';
 import './chinesechess.css';
 
+function multidimensionArrayDeepCopy(obj:any):any{
+    var out = [],i = 0,len = obj.length;
+    for (; i < len; i++) {
+        if (obj[i] instanceof Array){
+            out[i] = multidimensionArrayDeepCopy(obj[i]);
+        }
+        else out[i] = obj[i];
+    }
+    return out;
+}
+
 interface IState {
     winner:string | null,
     sideWidth:number,
     sideHeight:number,
-    blockWidth:number
+    blockWidth:number,
+    squares:any[10][9]
     // sideLength:number,
     // blockWidth:number
 }
@@ -23,21 +35,30 @@ class Game extends React.Component<{},IState> {
         winner:null,
         blockWidth:this.blockWidth,
         sideWidth:this.blockWidth*10,
-        sideHeight:this.blockWidth*11
+        sideHeight:this.blockWidth*11,
+        squares: Array(10).fill(null).map((val,idx) => {
+            return new Array(9).fill(null)
+        })
     }
 
 
     public render() {
-        const  blockWidth:number = this.state.blockWidth;
-        const  sideWidth:number = this.state.sideWidth;
-        const  sideHeight:number = this.state.sideHeight;
+        const blockWidth:number = this.state.blockWidth;
+        const sideWidth:number = this.state.sideWidth;
+        const sideHeight:number = this.state.sideHeight;
+        const squares:[][] = multidimensionArrayDeepCopy(this.state.squares)
+
+        
+
+        console.log(this.state.squares)
        
         return (
             <div>
                 <Board 
                     blockWidth={blockWidth}
                     sideWidth={sideWidth}
-                    sideHeight={sideHeight}>
+                    sideHeight={sideHeight}
+                    squares={squares}>
                 </Board>
             </div>
         )
@@ -47,7 +68,8 @@ class Game extends React.Component<{},IState> {
 interface BoardProps {
     sideWidth:number,
     sideHeight:number,
-    blockWidth:number
+    blockWidth:number,
+    squares:[][]
 }
 
 class Board extends React.Component<BoardProps,{}>{
@@ -193,10 +215,32 @@ class Board extends React.Component<BoardProps,{}>{
     }
 
     public render() {
+        const squares= this.props.squares;
+        const blockWidth:number = this.props.blockWidth;
+        const sideWidth:number = this.props.sideWidth;
+        const sideHeight:number = this.props.sideHeight;
+        const doms = squares.map((arr:[],lineIdx:number) => {
+            let square = arr.map((val:any,colIdx:number) => {
+                return (
+                    <div key={colIdx} className="square" style={{flex:1,height:"100%"}}>
+
+                    </div>
+                )
+            })
+            return (
+                <div className="square-row" key={lineIdx} style={{height:blockWidth,width:blockWidth*9+"px",display:"flex"}}>
+                    {square}
+                </div>
+            )
+        })
+
         return (
             <div className="board" 
                 style={{width:this.props.sideWidth+"px",height:this.props.sideHeight+"px"}}>
                     <canvas id="chinese-chess-board-canvas"></canvas>
+                    <div>
+                        {doms}
+                    </div>
             </div>
         )
     }

@@ -1,0 +1,18 @@
+.board{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+#chinese-chess-board-canvas{
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.square{
+    outline: 1px dashed #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+}

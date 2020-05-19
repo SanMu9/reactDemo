@@ -114,12 +114,18 @@ class Game extends React.Component<{},IState> {
             const squares:any[10][9] = multidimensionArrayDeepCopy(this.state.squares);
             const chessInfo:number = squares[chessInitPos[0]][chessInitPos[1]];
             squares[chessInitPos[0]][chessInitPos[1]] = 0;
+            const tarPosChess:number = squares[pos[0]][pos[1]];
+            const enemyBoss = this.state.bIsNext?16:26;
+            const enemySide = this.state.bIsNext?"红方":"黑方";
             squares[pos[0]][pos[1]] = chessInfo;
+
+            const winner:string|null = tarPosChess===enemyBoss?enemySide:null;
 
             this.chessMoveAnimation(dragChess,chessInitPos,pos,()=>{
                 this.setState({
                     squares:squares,
-                    bIsNext:!this.state.bIsNext
+                    bIsNext:!this.state.bIsNext,
+                    winner:winner
                 })
             })
 
@@ -187,13 +193,23 @@ class Game extends React.Component<{},IState> {
         // if(bp.join("")===ep.join("")){return []}
         const dragChessType:number = chessType%10;//棋子类型
         const dragChessSide:number = Math.floor(chessType/10);//棋子方,黑方:2 红方：1
+        const squares:[][] = this.state.squares;
 
         switch(dragChessType){
             //兵、卒
             case 0:
                 return (()=>{
                     let md =  dragChessSide==1?-1:1,//移动方向，即红方line值只能减，黑方只能增
-                        posAllowed = [[bp[0],bp[1]-1].join(""),[bp[0],bp[1]+1].join(""),[bp[0]+md,bp[1]].join("")];
+                        posAllowed:string[]= [],
+                        arr:number[][]= [[bp[0],bp[1]-1],[bp[0],bp[1]+1],[bp[0]+md,bp[1]]];
+                    arr.forEach((item)=>{
+                        if(squares[item[0]]&&(squares[item[0]][item[1]]==0||squares[item[0]][item[1]])){
+                            let chessOnRoute:number = squares[item[0]][item[1]];
+                            if(!this.oneOfUs(chessOnRoute)){
+                                posAllowed.push([item[0],item[1]].join(""))
+                            }
+                        }
+                    })
                     return posAllowed
                 })()
             // 炮
@@ -203,11 +219,9 @@ class Game extends React.Component<{},IState> {
                         line:number = bp[0],
                         col:number = bp[1],
                         chessCountOnRoute:number = 0;
-                    const squares:[][] = this.state.squares;
                     // 棋子右侧路线
                     for(let i=col+1;i<9;i++){
                         let chessOnRoute:number = squares[line][i];
-                        console.log(chessOnRoute)
                         // 目标处无棋子且路线上无棋子，或目标区域为敌方棋子且路线上有一个棋子，两种情况棋子可以移动
                         if((chessOnRoute===0&&chessCountOnRoute===0)){
                             posAllowed.push([line,i].join(""));
@@ -221,10 +235,215 @@ class Game extends React.Component<{},IState> {
                             chessCountOnRoute++;
                         }
                     }
+                    chessCountOnRoute=0;
                     // 棋子左侧路线
+                    for(let i=col-1;i>=0;i--){
+                        let chessOnRoute:number = squares[line][i];
+                        if(chessOnRoute===0&&chessCountOnRoute===0){
+                            posAllowed.push([line,i].join(""));
+                            continue;
+                        }
+                        if(this.isEnemy(chessOnRoute)&&chessCountOnRoute===1){
+                            posAllowed.push([line,i].join(""));
+                            break;
+                        }
+                        if(chessOnRoute!=0){
+                            chessCountOnRoute++;
+                        }
+                    }
+                    chessCountOnRoute=0;
+                    // 棋子上方路线
+                    for(let i=line-1;i>=0;i--){
+                        let chessOnRoute:number = squares[i][col];
+                        if(chessOnRoute===0&&chessCountOnRoute===0){
+                            posAllowed.push([i,col].join(""));
+                            continue;
+                        }
+                        if(this.isEnemy(chessOnRoute)&&chessCountOnRoute===1){
+                            posAllowed.push([i,col].join(""));
+                            break;
+                        }
+                        if(chessOnRoute!=0){
+                            chessCountOnRoute++;
+                        }
+                    }
+                    chessCountOnRoute=0;
+                    // 棋子下方路线
+                    for(let i=line+1;i<10;i++){
+                        let chessOnRoute:number = squares[i][col];
+                        if(chessOnRoute===0&&chessCountOnRoute===0){
+                            posAllowed.push([i,col].join(""));
+                            continue;
+                        }
+                        if(this.isEnemy(chessOnRoute)&&chessCountOnRoute===1){
+                            posAllowed.push([i,col].join(""));
+                            break;
+                        }
+                        if(chessOnRoute!=0){
+                            chessCountOnRoute++;
+                        }
+                    }
+                    chessCountOnRoute=0;
                     // console.log(posAllowed)
                     return posAllowed
                     // return false
+                })()
+            // 車
+            case 2:
+                return (()=>{
+                    let posAllowed:string[] = [],
+                        line:number = bp[0],
+                        col:number = bp[1];
+                    for(let i=col+1;i<9;i++){
+                        let chessOnRoute:number = squares[line][i];
+                        if(chessOnRoute===0){
+                            posAllowed.push([line,i].join(""));
+                            continue;
+                        }else if(this.isEnemy(chessOnRoute)){
+                            posAllowed.push([line,i].join(""));
+                            break;
+                        }else{
+                            break;
+                        }
+                    }
+                    for(let i=col-1;i>=0;i--){
+                        let chessOnRoute:number = squares[line][i];
+                        if(chessOnRoute===0){
+                            posAllowed.push([line,i].join(""));
+                            continue;
+                        }else if(this.isEnemy(chessOnRoute)){
+                            posAllowed.push([line,i].join(""));
+                            break;
+                        }else{
+                            break;
+                        }
+                    }
+                    for(let i=line+1;i<10;i++){
+                        let chessOnRoute:number = squares[i][col];
+                        if(chessOnRoute===0){
+                            posAllowed.push([i,col].join(""));
+                            continue;
+                        }else if(this.isEnemy(chessOnRoute)){
+                            posAllowed.push([i,col].join(""));
+                            break;
+                        }else{
+                            break;
+                        }
+                    }
+                    for(let i=line-1;i>=0;i--){
+                        let chessOnRoute:number = squares[i][col];
+                        if(chessOnRoute===0){
+                            posAllowed.push([i,col].join(""));
+                            continue;
+                        }else if(this.isEnemy(chessOnRoute)){
+                            posAllowed.push([i,col].join(""));
+                            break;
+                        }else{
+                            break;
+                        }
+                    }
+                    console.log(posAllowed)
+                    return posAllowed
+                })()
+            // 馬
+            case 3:
+                return (()=>{
+                    let posAllowed:string[] = [],
+                        line:number = bp[0],
+                        col:number = bp[1],
+                        arr:number[][] = [[line,col-1],[line,col+1],[line-1,col],[line+1,col]],//棋子上下左右四个位置
+                        tarPos:number[][] = [];//不存在憋马脚情况的日字位置
+                        
+                    arr.forEach((item)=>{
+                        // 如果马四周不存在棋子，即不存在憋马脚的情况
+                        if(squares[item[0]]&&squares[item[0]][item[1]]==0){
+                            if(item[1]==col){
+                                tarPos.push([line+(item[0]-line)*2,col-1]);
+                                tarPos.push([line+(item[0]-line)*2,col+1]);
+                            }else{
+                                tarPos.push([line-1,col+(item[1]-col)*2]);
+                                tarPos.push([line+1,col+(item[1]-col)*2]);
+                            }
+                        }
+                    })
+                    console.log(tarPos)
+                    tarPos.forEach((item) => {
+                        if(squares[item[0]]&&(squares[item[0]][item[1]]===0||squares[item[0]][item[1]])){
+                            let chessOnRoute:number = squares[item[0]][item[1]];
+                            if(!this.oneOfUs(chessOnRoute)){
+                                posAllowed.push([item[0],item[1]].join(""))
+                            }
+                        }
+                    })
+                    
+                    return posAllowed
+                })()
+            // 象
+            case 4:
+                return (()=>{
+                    let posAllowed:string[] = [],
+                        line:number = bp[0],
+                        col:number = bp[1],
+                        arr:string[]= ["02","20","24","06","28","42","46","92","96","70","74","78","52","58"],
+                        tarPos:string[] = [[line-2,col+2].join(""),[line-2,col-2].join(""),[line+2,col+2].join(""),[line+2,col-2].join("")];
+                    tarPos.forEach(item => {
+                        let tarLine:number = parseInt(item[0]),
+                            tarCol:number = parseInt(item[1]);
+                        // 目标位置为象允许走的位置
+                        if(arr.indexOf(item)>=0&&!this.oneOfUs(squares[tarLine][tarCol])){
+                            if(squares[(tarLine+line)/2][(tarCol+col)/2]===0){
+                                posAllowed.push(item) 
+                            }
+                        }
+                    })
+                    return posAllowed
+                })()
+            // 士
+            case 5:
+                return (() => {
+                    let posAllowed:string[] = [],
+                        line:number = bp[0],
+                        col:number = bp[1],
+                        arr:string[] = ["03","05","14","23","25","93","95","84","73","75"],
+                        tarPos:string[] = [[line+1,col+1].join(""),[line+1,col-1].join(""),[line-1,col-1].join(""),[line-1,col+1].join("")];
+                    tarPos.forEach(item=>{
+                        let tarLine:number = parseInt(item[0]),
+                            tarCol:number = parseInt(item[1]);
+                        if(arr.indexOf(item)>=0&&!this.oneOfUs(squares[tarLine][tarCol])){
+                            posAllowed.push(item)
+                        }
+                    })
+                    return posAllowed;
+                })()
+            // 帥、将
+            case 6:
+                return (()=>{
+                    let posAllowed:string[] = [],
+                        line:number = bp[0],
+                        col:number = bp[1],
+                        arr:string[] = ["03","04","05","13","14","15","23","24","25","93","94","95","83","84","85","73","74","75"],
+                        tarPos:string[] = [[line-1,col].join(""),[line+1,col].join(""),[line,col+1].join(""),[line,col-1].join("")];
+                    tarPos.forEach(item=>{
+                        let tarLine:number = parseInt(item[0]),
+                            tarCol:number = parseInt(item[1]);
+                        if(arr.indexOf(item)>=0&&!this.oneOfUs(squares[tarLine][tarCol])){
+                            let md = dragChessSide==1?-1:1,
+                                emenyBoss = dragChessSide==1?"26":"16",
+                                allow:boolean = true;
+                            for(let i=tarLine+md;i<10&&i>=0;i+=md){
+                                let chessOnRoute:number = squares[i][tarCol];
+                                console.log(chessOnRoute)
+                                if(chessOnRoute!==0){
+                                    allow = chessOnRoute.toString()===emenyBoss?false:true;
+                                    break;
+                                }
+                            }
+                            if(allow){
+                                posAllowed.push(item)
+                            }
+                        }
+                    })
+                    return posAllowed;
                 })()
             default:
                 break;
@@ -242,11 +461,18 @@ class Game extends React.Component<{},IState> {
         const sideHeight:number = this.state.sideHeight;
         const squares:[][] = multidimensionArrayDeepCopy(this.state.squares);
         const bIsNext:boolean = this.state.bIsNext;
+        const winner:string|null = this.state.winner;
+        let text:string = bIsNext?"黑方回合":"红方回合";
 
-        console.log(this.state.blockWidth)
+        if(winner){
+            text = "获胜方 "+winner;
+        }
+
+        // console.log(this.state.blockWidth)
        
         return (
             <div id="game">
+                <p>{text}</p>
                 <Board 
                     blockWidth={blockWidth}
                     sideWidth={sideWidth}

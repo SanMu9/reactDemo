@@ -1,5 +1,6 @@
 import React from 'react';
 import './chessman.css';
+// import { number } from 'prop-types';
 
 
 const RED = {
@@ -35,11 +36,13 @@ interface IProps {
     blockWidth:number,
     info:number,
     bIsNext:boolean,
-    chessManOnDrag:Function
+    chessManOnDragStart:Function,
+    pos:number[]
 }
 // 每个棋子信息（info）由 棋子类型（CHESSMAN_TYPE） + 棋子名字代号（RED||BLACK）的数字组成
 // 比如 22 代表 黑车
 // info值为0代表该位置没有棋子
+// pos表示当前行列位置
 class ChessMan extends React.Component<IProps,{}>{
 
     public render() {
@@ -53,14 +56,16 @@ class ChessMan extends React.Component<IProps,{}>{
             const infoStr:string = info.toString();
             const color:string = COLOR_INDEX[infoStr[0]];
             const name:string = CHESSMAN_TYPE[infoStr[0]][infoStr[1]];
-            const draggable:boolean = infoStr[0]==='2'&&this.props.bIsNext?true:false;
+            const bIsNext:boolean = this.props.bIsNext;
+            const draggable:boolean = (infoStr[0]==='2'&&bIsNext)||(infoStr[0]==='1'&&!bIsNext)?true:false;
+            const pos:number[]=this.props.pos;
             
             return (
                 <div 
                     style={{width:chessmanWidth+'px',height:chessmanWidth+'px',fontSize:chessmanWidth*0.6+'px',color:color,border:chessmanWidth*0.1+'px solid #C4A175'}}
-                    className={"chessman"}
+                    className={["chessman",draggable?"draggable":null].join(" ")}
                     draggable={draggable}
-                    onDragStart={(ev:React.DragEvent) => this.props.chessManOnDrag(ev)}>
+                    onDragStart={(ev:React.DragEvent)=>this.props.chessManOnDragStart(pos,ev)}>
                     {name}
                 </div>
             )

@@ -5,8 +5,17 @@
     border-radius: 50%;
     box-sizing: border-box;
     background: #DFCFA6;
-    cursor: pointer;
+    /* cursor: pointer; */
     font-family: 'kaiti';
     /* border-style: inset; */
-    box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.4) inset
+    box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.4) inset;
+    cursor: default;
 }
+.chessman.draggable{
+    cursor: grab;
+}
+/* .chessman{
+    position: absolute;
+    transform: translate(-50%,-50%);
+    transition: all 1s;
+} */

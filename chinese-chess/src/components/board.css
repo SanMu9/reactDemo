@@ -10,9 +10,11 @@
     top: 0;
 }
 .square{
-    outline: 1px dashed #333;
+    /* outline: 1px dashed #333; */
     display: flex;
     justify-content: center;
     align-items: center;
     user-select: none;
+    /* perspective: 200px;
+    -webkit-perspective:200px */
 }

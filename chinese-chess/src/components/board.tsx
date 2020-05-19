@@ -9,12 +9,12 @@ interface BoardProps {
     blockWidth:number,
     squares:[][],
     bIsNext:boolean,
-    chessManOnDrag:Function
+    chessManOnDragStart:Function,
+    squareOnDragEnter:Function,
+    squareOnDragOver:Function,
+    squareOnDrop:Function
 }
 
-const chessSet = [
-    {}
-]
 
 class Board extends React.Component<BoardProps,{}>{
 
@@ -174,10 +174,14 @@ class Board extends React.Component<BoardProps,{}>{
         const doms:JSX.Element[] = squares.map((arr:[],lineIdx:number) => {
             let square = arr.map((val:[],colIdx:number) => {
                 return (
-                    <div key={colIdx} className="square" style={{flex:1,height:"100%"}}>
+                    <div key={colIdx} className="square" style={{flex:1,height:"100%"}} 
+                        onDrop={(ev:React.DragEvent)=>this.props.squareOnDrop([lineIdx,colIdx],ev)}
+                        onDragOver={(ev:React.DragEvent)=>this.props.squareOnDragOver(ev)}
+                        onDragEnter={(ev:React.DragEvent)=>this.props.squareOnDragEnter([lineIdx,colIdx],ev)}
+                        >
                         <ChessMan
-                            chessManOnDrag={(ev:React.DragEvent)=>this.props.chessManOnDrag(ev)}
-                            bIsNext={bIsNext} blockWidth={blockWidth} info={squares[lineIdx][colIdx]}>
+                            chessManOnDragStart={(pos:string,ev:React.DragEvent)=>this.props.chessManOnDragStart(pos,ev)}
+                            bIsNext={bIsNext} blockWidth={blockWidth} info={squares[lineIdx][colIdx]} pos={[lineIdx,colIdx]}>
                         </ChessMan>
                     </div>
                 )
@@ -190,7 +194,7 @@ class Board extends React.Component<BoardProps,{}>{
         })
 
         return (
-            <div className="board" 
+            <div className="board" id="chinese-chess-board"
                 style={{width:this.props.sideWidth+"px",height:this.props.sideHeight+"px"}}>
                     <canvas id="chinese-chess-board-canvas" style={{zIndex:0}}/>
                     <div style={{zIndex:1}}>

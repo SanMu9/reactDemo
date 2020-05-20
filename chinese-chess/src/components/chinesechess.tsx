@@ -96,8 +96,8 @@ class Game extends React.Component<{},IState> {
 
     public squareOnDragEnter = (pos:number[],ev:React.DragEvent) => {
         ev.preventDefault();
-        let chessInitPos:number[] = [this.dragChessInitialPos[0],this.dragChessInitialPos[1]],
-            chessInfo:number = this.state.squares[chessInitPos[0]][chessInitPos[1]];
+        // let chessInitPos:number[] = [this.dragChessInitialPos[0],this.dragChessInitialPos[1]],
+            // chessInfo:number = this.state.squares[chessInitPos[0]][chessInitPos[1]];
         
         this.dropSquareDropEffect = this.posChessCanDrop.indexOf(pos.join(""))>=0?"move":"none";
     }
@@ -106,10 +106,10 @@ class Game extends React.Component<{},IState> {
         ev.preventDefault();
         // 该位置允许释放棋子
         if(this.dropSquareDropEffect ==="move"){
-            const tar:HTMLElement = ev.target as HTMLElement;
+            // const tar:HTMLElement = ev.target as HTMLElement;
             const chessInitPos:number[] = this.dragChessInitialPos;
             const dragChess:HTMLElement= this.dragChessDom;
-            const parent:HTMLElement = dragChess.parentElement as HTMLElement;
+            // const parent:HTMLElement = dragChess.parentElement as HTMLElement;
 
             const squares:any[10][9] = multidimensionArrayDeepCopy(this.state.squares);
             const chessInfo:number = squares[chessInitPos[0]][chessInitPos[1]];
@@ -186,7 +186,7 @@ class Game extends React.Component<{},IState> {
     public isEnemy = (chessInfo:number):boolean => {
         const side = this.state.bIsNext?2:1;
         const chessType = Math.floor(chessInfo/10);
-        return chessType!=0&&side!=chessType
+        return chessType!==0&&side!==chessType
     }
 
     public getPosChessCanDrop(bp:number[],chessType:number):string[]{
@@ -199,11 +199,17 @@ class Game extends React.Component<{},IState> {
             //兵、卒
             case 0:
                 return (()=>{
-                    let md =  dragChessSide==1?-1:1,//移动方向，即红方line值只能减，黑方只能增
+                    let md =  dragChessSide===1?-1:1,//移动方向，即红方line值只能减，黑方只能增
                         posAllowed:string[]= [],
+                        line:number = bp[0],
+                        col:number = bp[1],
                         arr:number[][]= [[bp[0],bp[1]-1],[bp[0],bp[1]+1],[bp[0]+md,bp[1]]];
+                    // 未过河
+                    if((md===-1&&line>4)||(md===1&&line<5)){
+                        arr = [[line+md,col]]
+                    }
                     arr.forEach((item)=>{
-                        if(squares[item[0]]&&(squares[item[0]][item[1]]==0||squares[item[0]][item[1]])){
+                        if(squares[item[0]]&&(squares[item[0]][item[1]]===0||squares[item[0]][item[1]])){
                             let chessOnRoute:number = squares[item[0]][item[1]];
                             if(!this.oneOfUs(chessOnRoute)){
                                 posAllowed.push([item[0],item[1]].join(""))
@@ -231,7 +237,7 @@ class Game extends React.Component<{},IState> {
                             posAllowed.push([line,i].join(""));
                             break;
                         }
-                        if(chessOnRoute!=0){
+                        if(chessOnRoute!==0){
                             chessCountOnRoute++;
                         }
                     }
@@ -247,7 +253,7 @@ class Game extends React.Component<{},IState> {
                             posAllowed.push([line,i].join(""));
                             break;
                         }
-                        if(chessOnRoute!=0){
+                        if(chessOnRoute!==0){
                             chessCountOnRoute++;
                         }
                     }
@@ -263,7 +269,7 @@ class Game extends React.Component<{},IState> {
                             posAllowed.push([i,col].join(""));
                             break;
                         }
-                        if(chessOnRoute!=0){
+                        if(chessOnRoute!==0){
                             chessCountOnRoute++;
                         }
                     }
@@ -279,7 +285,7 @@ class Game extends React.Component<{},IState> {
                             posAllowed.push([i,col].join(""));
                             break;
                         }
-                        if(chessOnRoute!=0){
+                        if(chessOnRoute!==0){
                             chessCountOnRoute++;
                         }
                     }
@@ -356,8 +362,8 @@ class Game extends React.Component<{},IState> {
                         
                     arr.forEach((item)=>{
                         // 如果马四周不存在棋子，即不存在憋马脚的情况
-                        if(squares[item[0]]&&squares[item[0]][item[1]]==0){
-                            if(item[1]==col){
+                        if(squares[item[0]]&&squares[item[0]][item[1]]===0){
+                            if(item[1]===col){
                                 tarPos.push([line+(item[0]-line)*2,col-1]);
                                 tarPos.push([line+(item[0]-line)*2,col+1]);
                             }else{
@@ -427,8 +433,8 @@ class Game extends React.Component<{},IState> {
                         let tarLine:number = parseInt(item[0]),
                             tarCol:number = parseInt(item[1]);
                         if(arr.indexOf(item)>=0&&!this.oneOfUs(squares[tarLine][tarCol])){
-                            let md = dragChessSide==1?-1:1,
-                                emenyBoss = dragChessSide==1?"26":"16",
+                            let md = dragChessSide===1?-1:1,
+                                emenyBoss = dragChessSide===1?"26":"16",
                                 allow:boolean = true;
                             for(let i=tarLine+md;i<10&&i>=0;i+=md){
                                 let chessOnRoute:number = squares[i][tarCol];

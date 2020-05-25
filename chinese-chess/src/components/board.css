@@ -9,6 +9,13 @@
     left: 0;
     top: 0;
 }
+/* .chess-container{
+    display: flex;
+    flex-direction: column-reverse;
+}
+.square-row{
+    flex-direction: row-reverse
+} */
 .square{
     /* outline: 1px dashed #333; */
     display: flex;

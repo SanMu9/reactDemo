@@ -84,6 +84,7 @@ class Game extends React.Component<{},IState> {
     public chessManOnDragStart(pos:number[],ev:React.DragEvent):void{
         // const tar:HTMLElement = ev.target as HTMLElement;
         this.dragChessInitialPos = [pos[0],pos[1]];
+        console.log(this.dragChessInitialPos)
         this.dragChessDom = ev.target as HTMLElement;
         ev.dataTransfer.effectAllowed = "move";
         this.posChessCanDrop = this.getPosChessCanDrop(this.dragChessInitialPos,this.state.squares[pos[0]][pos[1]]);
@@ -116,7 +117,7 @@ class Game extends React.Component<{},IState> {
             squares[chessInitPos[0]][chessInitPos[1]] = 0;
             const tarPosChess:number = squares[pos[0]][pos[1]];
             const enemyBoss = this.state.bIsNext?16:26;
-            const enemySide = this.state.bIsNext?"红方":"黑方";
+            const enemySide = this.state.bIsNext?"黑方":"红方";
             squares[pos[0]][pos[1]] = chessInfo;
 
             const winner:string|null = tarPosChess===enemyBoss?enemySide:null;

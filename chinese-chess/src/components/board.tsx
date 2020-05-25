@@ -197,7 +197,7 @@ class Board extends React.Component<BoardProps,{}>{
             <div className="board" id="chinese-chess-board"
                 style={{width:this.props.sideWidth+"px",height:this.props.sideHeight+"px"}}>
                     <canvas id="chinese-chess-board-canvas" style={{zIndex:0}}/>
-                    <div style={{zIndex:1}}>
+                    <div className="chess-container" style={{zIndex:1}}>
                         {doms}
                     </div>
             </div>

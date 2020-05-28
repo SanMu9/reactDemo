@@ -29,7 +29,7 @@ router.get('/', function (req, res, next) {
   // for(key in req){
   //   dataset.push(key)
   // }
-  res.send(ips);
+  res.send(path);
 
   // res.render('index', { title: 'Express' });
 });
@@ -37,8 +37,13 @@ router.get('/', function (req, res, next) {
 router.get('/getRoomsInfo', function (req, res, next) {
   db.sql('select * from rooms_tb',[],function(result){
     console.log(result)
-    res.status(200).send(result);
+    res.send(result);
   })
 });
+
+router.post('/createRoom',function(req, res, next){
+
+  // db.sql('insert into rooms_tb ()')
+})
 
 module.exports = router;

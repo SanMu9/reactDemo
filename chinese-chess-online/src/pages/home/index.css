@@ -1,0 +1,45 @@
+:root {
+    --theme-color: #DFCFA6;
+  }
+  
+  .home {
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .home .regist-box{
+    width: 300px;
+    height: 120px;
+    background: var(--theme-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .home .regist-box input{
+    margin-bottom: 10px;
+  }
+  
+  .home button.big-btn{
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #DFCFA6;
+    border:10px solid #333;
+    font-family: 'kaiti';
+    box-shadow: 0 0 10px 0 #000 inset;
+  }
+  .home button:disabled{
+    cursor: default;
+    /* color:#eee; */
+    background: #eee
+  }
+  .home button:focus{
+    outline: none
+  }
+  

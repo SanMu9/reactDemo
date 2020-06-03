@@ -18,11 +18,6 @@ interface IState {
     userName: string
 }
 
-// 注册所需数据
-interface registerParams {
-    userName: string
-}
-
 class Home extends React.Component {
     // static getDerivedStateFromProps({},{}){
     // }
@@ -50,44 +45,11 @@ class Home extends React.Component {
     }
     // public createRoom() {
     // }
-    public registerName(name: string) {
-        console.log(name)
-        let params: registerParams = {
-            userName: name
-        },
-        _this = this;
-        registerName(params).then(res => {
-            console.log(res)
-            if (res.status === 200) {
-                if (res.data.code === 200) {
-                    // _this.context.userName = name;
-                    _this.setState({
-                        userName: name
-                    })
-                } else if (res.data.code === 201) {
-                    alert("用户名已存在")
-                }
-            }
-        }).catch(err => {
-            alert(err.message)
-        })
-    }
+    
 
     public render() {
-        // console.log(this.context.store)
         const userName: string = this.state.userName;
-        if (userName === "" || userName === null || userName===undefined) {
-            let name: string = "";
-            return (
-                <div className="home">
-                    <div className="regist-box">
-                        <p>输入昵称</p>
-                        <input type="text" onChange={(ev: React.ChangeEvent) => name = (ev.target as HTMLInputElement).value} />
-                        <button onClick={() => this.registerName(name)}>确认</button>
-                    </div>
-                </div>
-            )
-        }
+        console.log(this.props)
         const rooms = this.state.rooms;
         const cWidth = this.state.cWidth;
         const btnStyle = {
@@ -106,7 +68,6 @@ class Home extends React.Component {
     }
 
     public componentDidMount() {
-        console.log(this.props)
         window.addEventListener('resize', () => this.resizeWindow());
         getRoomsInfo().then((res: any) => {
             console.log(res)

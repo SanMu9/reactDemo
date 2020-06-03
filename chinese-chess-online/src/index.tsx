@@ -19,7 +19,7 @@ console.log(store.getState())
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App></App>
+      <App test="ssss"></App>
       {/* <Router>
         <Route exact path="/" component={App} />
         <Route path="/rooms" component={Rooms} />

@@ -7,3 +7,7 @@ export const getRoomsInfo = function (params) {
 export const registerName = function (params) {
     return axios.post("/api/registerName",params)
 }
+
+export const register = function (params){
+    return axios.post("/api/login/register",params)
+}

@@ -1,5 +1,5 @@
 import React from 'react';
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
 
 import './index.css';
 import {connect} from 'react-redux';

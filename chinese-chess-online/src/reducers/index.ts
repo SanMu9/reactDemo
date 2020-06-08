@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import {USER,IStoreState} from './../entity/index';
+import {USER, ROOMINFO, PAGEINFO} from './../entity/index';
 import io from 'socket.io-client';
 
 
@@ -35,6 +35,28 @@ const socketReducer = (state=socketDefaultState,action={type:'',data:null}) => {
     }
 }
 
+const roomsDefaultState:ROOMINFO[] = []
+const roomsReducer = (state=roomsDefaultState,action={type:'',data:roomsDefaultState})=>{
+    const {type,data} = action;
+    switch(type){
+        case 'SETROOMS':
+            return data;
+        default:
+            return state;
+    }
+}
+
+const pageDefaultState:PAGEINFO = {cWidth:document.documentElement.clientWidth};
+const pageReducer = (state=pageDefaultState,action={type:''}) => {
+    const {type} = action;
+    switch(type){
+        case 'SIZECHANGE':
+            return {cWidth:document.documentElement.clientWidth};
+        default:
+            return state
+    }
+}
+
 // const testReducer = (state=0,action={type:"COUNT",count:0}) => {
 //     switch(action.type){
 //         case "COUNT":
@@ -48,7 +70,9 @@ const socketReducer = (state=socketDefaultState,action={type:'',data:null}) => {
 
 const reducers = combineReducers({
     user:userReducer,
-    socket:socketReducer
+    socket:socketReducer,
+    rooms:roomsReducer,
+    page:pageReducer
 })
 
 export default reducers

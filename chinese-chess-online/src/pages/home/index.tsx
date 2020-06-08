@@ -2,56 +2,18 @@ import React from 'react';
 import { connect } from 'react-redux'
 import './index.css';
 import { getRoomsInfo, registerName } from './../../api/api';
+import {IStoreState,ROOMINFO} from '../../entity/index';
+import { Dispatch } from 'redux';
+import {AxiosResponse} from 'axios';
 
-interface roomsInfo {
-    roomId: number | null,
-    player1: number | null,
-    player2: number | null,
-    roomName?: string | null,
-    player1Name?: string | null,
-    player2Name?: string | null
-}
-
-interface IState {
-    rooms: roomsInfo[],
-    cWidth: number,
-    userName: string
-}
 
 class Home extends React.Component {
     // static getDerivedStateFromProps({},{}){
     // }
-    // private cWidth:number = document.documentElement.clientWidth;
-    // private cHeight:number = document.documentElement.clientHeight;
-    readonly state: IState = {
-        rooms: [],
-        cWidth: document.documentElement.clientWidth,
-        userName: ""
-    }
-
-    private resizeWindow(): void {
-        let cWidth: number = document.documentElement.clientWidth;
-        this.setState({
-            cWidth: cWidth
-        });
-        // this.cWidth = document.documentElement.clientWidth;
-        // this.cHeight = document.documentElement.clientHeight;
-        // this.blockWidth = this.cWidth>this.cHeight?this.cHeight*0.8/11:this.cWidth*0.8/10;
-        // this.setState({
-        //     blockWidth:this.blockWidth,
-        //     sideWidth:this.blockWidth*10,
-        //     sideHeight:this.blockWidth*11,
-        // })
-    }
-    // public createRoom() {
-    // }
     
-
     public render() {
-        const userName: string = this.state.userName;
-        console.log(this.props)
-        const rooms = this.state.rooms;
-        const cWidth = this.state.cWidth;
+        const rooms:ROOMINFO[] = (this.props as any).rooms;
+        const cWidth = (this.props as any).cWidth;
         const btnStyle = {
             width: cWidth * 0.6 + "px",
             height: cWidth * 0.6 * 0.4 + "px",
@@ -68,24 +30,55 @@ class Home extends React.Component {
     }
 
     public componentDidMount() {
-        window.addEventListener('resize', () => this.resizeWindow());
-        getRoomsInfo().then((res: any) => {
+        const {resizePage,setRooms} = (this.props as any);
+        window.addEventListener('resize', () => resizePage());
+
+        getRoomsInfo().then((res:AxiosResponse) => {
             console.log(res)
-        }).catch((err: any) => {
+            if(res.status === 200){
+                const data = res.data;
+                setRooms(data)
+            }
+        }).catch((err) => {
         })
     }
 
     public componentWillUnmount() {
-        window.removeEventListener('resize', () => this.resizeWindow());
+        const {resizePage} = (this.props as any);
+        window.removeEventListener('resize', () => resizePage());
+    }
+
+    public createRoom() {
+        const {userName} = this.props as any;
+        
+        
     }
 }
 // App.contextTypes = {
 //     store: React.PropTypes.object
 // }
-const mapStateToProps = (state:any)=> {
+const mapStateToProps = (state:IStoreState)=> {
     return {
-        user: state.user
+        userName: state.user.uName,
+        cWidth:state.page.cWidth,
+        rooms:state.rooms
     }
 };
 
-export default connect(mapStateToProps)(Home);
+const mapDispatchToProps = (dispatch:Dispatch) => {
+    return {
+        setRooms:(data:ROOMINFO[]) => {
+            dispatch({
+                type:"SETROOMS",
+                data:data
+            })
+        },
+        resizePage:() => {
+            dispatch({
+                type:"SIZECHANGE"
+            })
+        }
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(Home);

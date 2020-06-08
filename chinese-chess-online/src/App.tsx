@@ -51,11 +51,7 @@ class App extends React.Component {
 
         )
     }
-    componentWillMount(){
-        // const {ioConnect} = this.props as any;
-        // const socket = io('ws://localhost:8088/');
-        // ioConnect(socket);
-    }
+  
     componentDidMount(){
        
     }

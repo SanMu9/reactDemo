@@ -10,20 +10,16 @@ import { Provider } from 'react-redux';
 import reducers from './reducers/index';
 
 import App from './App';
-import Rooms from './pages/rooms/index';
-import Home from './pages/home/index';
+
 
 const store = createStore(reducers);
+
 console.log(store.getState())
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App test="ssss"></App>
-      {/* <Router>
-        <Route exact path="/" component={App} />
-        <Route path="/rooms" component={Rooms} />
-      </Router> */}
+      <App ></App>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')

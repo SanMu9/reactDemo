@@ -1,9 +1,10 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {register} from './../../api/api';
+import {register,login} from './../../api/api';
 import './login.css';
 import {USER} from './../../entity/index';
 import { Dispatch } from 'redux';
+import {AxiosResponse} from 'axios';
 
 
 function registerSuccess(data:USER){
@@ -23,10 +24,6 @@ const mapDispatchToProps = (dispatch:Dispatch) => {
 
 class Login extends React.Component{
 
-    static defaultProps = {
-
-    }
-
     readonly state = {
         login:true,
         userName:"",
@@ -38,6 +35,8 @@ class Login extends React.Component{
 
     public render(){
         const {login,userName,pw,pw2,info} = this.state;
+        console.log(this.state)
+        console.log(this.props)
         return login?
             (
                 <div className="login">
@@ -51,7 +50,7 @@ class Login extends React.Component{
                     </div>
                     <div>
                         <button onClick={() => this.toRegister()}>注册</button>
-                        <button>确认</button>
+                        <button onClick={() => this.loginConfirm()}>确认</button>
                     </div>
                    
                 </div>
@@ -84,6 +83,28 @@ class Login extends React.Component{
         })
     }
 
+    public loginConfirm(){
+        const {userName,pw} = this.state; 
+        const {history,saveToken} = this.props as any;
+
+        login({userName:userName,pw:pw}).then((res:AxiosResponse) => {
+            if(res.status === 200){
+                let result = res.data;
+                console.log(result)
+                if(result.code === 200){
+                    localStorage.setItem("chineseChessUName",userName);
+                    localStorage.setItem("chineseChessToken",result.token);
+                    saveToken({uName:userName,token:result.token});
+                    history.push("/")
+                }
+            }
+        }).catch(err=>{
+            console.log(err)
+        })
+
+
+    }
+
     public changeValue(ev:React.ChangeEvent,key:string){
         let value = (ev.target as HTMLInputElement).value;
         this.setState({
@@ -93,12 +114,11 @@ class Login extends React.Component{
 
 
     public sendRegisterInfo(){
-        const _this = this;
         const {userName,pw,pw2} = this.state;
         const {history} = this.props as any;
         const {saveToken} = this.props as any;
         console.log(saveToken);
-        if(pw != pw2){
+        if(pw !== pw2){
             this.setState({
                 info:"两次密码不一致"
             })
@@ -112,8 +132,8 @@ class Login extends React.Component{
                 if((res as any).status===200){
                     let result = res.data;
                     if(result.code===200){
-                        localStorage.setItem("chineseCheseUName",userName);
-                        localStorage.setItem("chineseCheseToken",result.token);
+                        localStorage.setItem("chineseChessUName",userName);
+                        localStorage.setItem("chineseChessToken",result.token);
                         saveToken({uName:userName,token:result.token});
                         history.push("/")
                     }

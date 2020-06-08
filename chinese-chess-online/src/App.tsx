@@ -1,9 +1,15 @@
 import React from 'react';
 
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import Rooms from './pages/rooms/index';
-import Home from './pages/home/index';
-import Login from './pages/login/login';
+import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom';
+// import Rooms from './pages/rooms/index';
+// import Home from './pages/home/index';
+// import Login from './pages/login/login';
+import io from 'socket.io-client';
+
+import { Dispatch } from 'redux';
+
+import {IStoreState} from './entity/index'
+import routerMap from './map/routerMap';
 
 import { connect } from 'react-redux'
 import './App.css';
@@ -11,66 +17,75 @@ import './App.css';
 
 class App extends React.Component {
     render() {
-        const {count,onClick,onClick2} = this.props as any;
-        console.log(this.props)
+        const { token } = this.props as any;
+        console.log(token)
+
+        const routes = routerMap.map((item,index)=>{
+            return (
+                !item.auth?
+                    <Route key={index} path={item.path} exact component={item.component}/>
+                    :
+                    (
+                        token ?
+                        <Route key={index} path={item.path} exact component={item.component}/>
+                        :
+                        <Route key={index} path={item.path} exact render={()=>(
+                            <Redirect to="/login"/>
+                        )} />
+                    )
+            )
+        })
         return (
-            // <div className="app">
-            //     {count}
-            //     <button onClick={onClick}>+</button>
-            //     <button onClick={()=>onClick2(4)}>--</button>
-            // </div>
+           
             <div className="app">
                 <Router>
-                    <Route exact path="/" component={Home}></Route >
+                    <Switch>
+                        {routes}
+                    </Switch>
+                    {/* <Route  path="/rooms" render={(props)=>(<Rooms {...props}/>)}></Route> */}
+                    {/* <Route exact path="/" component={Home}></Route >
                     <Route path="/rooms" component={Rooms}></Route>
-                    <Route path="/login" component={Login} uName="" token=""></Route>
+                    <Route path="/login" component={Login}></Route> */}
                 </Router>
             </div>
-        
+
         )
     }
-
+    componentWillMount(){
+        // const {ioConnect} = this.props as any;
+        // const socket = io('ws://localhost:8088/');
+        // ioConnect(socket);
+    }
+    componentDidMount(){
+       
+    }
+    componentWillUnmount(){
+        const {socket} = this.props as any;
+        socket.close();
+    }
 
 }
-// App.contextTypes = {
-//     store: React.PropTypes.object
-// }
 
-// const mapStateToProps = (state:any,ownProps:any)=> {
-//     console.log(ownProps)
-//     return {
-//         count:state.test
-//     }
-// };
-// const mapDispatchToProps = (dispatch:any) => {
-//     return {
-//         onClick:()=>{
-//             dispatch({
-//                 type:"COUNT"
-//             })
-//         },
-//         onClick2:(count:number)=> {
-//             dispatch({
-//                 type:"REDUCE",
-//                 count:count
-//             })
-//         }
-//     }
-// }
-const mapStateToProps = (state:any,ownProps:any) => {
+const mapStateToProps = (state: IStoreState) => {
     return {
-        token:state.token,
-        uName:state.uName
+        token: state.user.token,
+        uName: state.user.uName,
+        socket:state.socket
     }
 }
-const mapDispatchToProps = (dispatch:any) => {
+const mapDispatchToProps = (dispatch: Dispatch) => {
     return {
-        getToken:()=>{
+        getToken: () => {
             dispatch(
-                {type:"GETTOKEN"}
+                { type: "GETTOKEN" }
             )
         },
+        // ioConnect:(io:SocketIOClient.Socket) => {
+        //     dispatch(
+        //         {type:"IOCONNECT",data:io}
+        //     )
+        // }
     }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);

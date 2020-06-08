@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var db = require('./../config/db');
-
 // var app = express();
 
 // app.get('/',)

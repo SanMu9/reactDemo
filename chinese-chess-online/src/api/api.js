@@ -8,6 +8,10 @@ export const registerName = function (params) {
     return axios.post("/api/registerName",params)
 }
 
-export const register = function (params){
+export const register = function (params) {
     return axios.post("/api/login/register",params)
+}
+
+export const login = function (params) {
+    return axios.post("/api/login",params)
 }

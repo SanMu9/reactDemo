@@ -16,20 +16,21 @@ router.all('*', function (req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-    res.send('respond with a resource');
     const userName = req.body.userName;
     const pw = req.body.pw;
     const data  = {
         userName:userName,
         pw:pw
     };
+    console.log(data)
     const token = Jwt.generateToken(data);
     
-    db.sql('insert into users_tb (token) values (?) where name = ?',[token,userName],(result)=>{
+    db.sql('UPDATE users_tb SET token = ? WHERE name = ?',[token,userName],(result)=>{
+        console.log(result)
         if (result.result.affectedRows === 1) {
             res.send({ code: 200,token:token });
         } else {
-            res.send({ code: 0, msg: "插入失败" });
+            res.send({ code: 0, msg: "失败" });
         }
     })
 });

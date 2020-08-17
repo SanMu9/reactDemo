@@ -1,4 +1,4 @@
-.room{
+.room {
     width: 100%;
     height: 100%;
     display: flex;
@@ -7,11 +7,112 @@
     padding: 0 20px;
 }
 
-.room header{
+.room header {
     height: 65px;
     display: flex;
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
     border-bottom: 1px #333 solid;
+    position: relative;
+    font-size: 24px;
+}
+
+.room header .setting {
+    position: absolute;
+    right: 5px;
+    font-size: 16px;
+}
+
+.room main {
+    flex: 1;
+    height: 0;
+    overflow: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.room main .room-box {
+    width: 120px;
+    height: 120px;
+    margin: 20px;
+    background: rgba(221, 186, 132, 0.8);
+    display: flex;
+    margin: 20px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: rgba(0,0,0,.3);
+    transition: all .5s;
+}
+.room main .room-box:hover{
+    color: #000;
+    font-size: 24px;
+}
+.room main .room-box .room-board{
+    width: 120px;
+    height: 120px;
+    margin: 10px;
+    flex: none;
+    background: rgba(221, 186, 132, 0.8);
+}
+.room main .room-box .room-player{
+    width: 30px;
+    height: 30px;
+    flex: none;
+    border-radius: 50%;
+    border: 1px solid #000;
+
+}
+.room main .add-box{
+    width: 120px;
+    height: 120px;
+    margin:20px;
+    box-sizing: border-box;
+    border:1px dashed rgba(0,0,0,.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+}
+.room main .add-box svg{
+    width: 30%;
+    height: 30%;
+    fill: rgba(0,0,0,.8);
+}
+
+/* .room main .room-box>div {
+    flex: 1;
+} */
+
+.room main.noroom {
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+.big-btn {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #DFCFA6;
+    border: 10px solid #333;
+    font-family: 'kaiti';
+    box-shadow: 0 0 10px 0 #000 inset;
+    margin: 20px 0;
+}
+
+button.big-btn:disabled {
+    cursor: default;
+    /* color:#eee; */
+    background: #eee
+}
+
+button:focus {
+    outline: none
 }

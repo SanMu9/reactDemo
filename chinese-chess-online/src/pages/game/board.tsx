@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import './board.css';
 import ChessMan from './chessman';
 
-
 interface BoardProps {
+    selfSide:number,
     sideWidth:number,
     sideHeight:number,
     blockWidth:number,
@@ -14,11 +14,10 @@ interface BoardProps {
     squareOnDragEnter:Function,
     squareOnDragOver:Function,
     squareOnDrop:Function,
-    chessManOnTouchStart:Function,
+    chessManOnTouchStart:Function
     squareOnTouchMove:Function,
-    chessOnTouchEnd:Function,
+    chessOnTouchEnd:Function
 }
-
 
 class Board extends React.Component<BoardProps,{}>{
 
@@ -162,32 +161,31 @@ class Board extends React.Component<BoardProps,{}>{
 
     public componentDidMount(){
         this.initCanvas()
-        let dom = ReactDOM.findDOMNode(this);
         let _this = this;
+        let dom = ReactDOM.findDOMNode(this);
         (dom as HTMLElement).addEventListener("touchmove",function(event:TouchEvent){
             _this.props.squareOnTouchMove(event)
         },{passive:false})
-        console.log(dom)
     }
 
     public componentDidUpdate(){
         this.initCanvas()
-       
     }
 
     public componentWillUnmount(){
         let dom = ReactDOM.findDOMNode(this);
         let _this = this;
+
         (dom as HTMLElement).removeEventListener("touchmove",function(event:TouchEvent){
             _this.props.squareOnTouchMove(event)
         })
     }
 
-
     public render() {
         const squares:[][]= this.props.squares;
         const blockWidth:number = this.props.blockWidth;
         const bIsNext:boolean = this.props.bIsNext;
+        const selfSide:number = this.props.selfSide;
         console.log(squares)
         // const sideWidth:number = this.props.sideWidth;
         // const sideHeight:number = this.props.sideHeight;
@@ -200,14 +198,13 @@ class Board extends React.Component<BoardProps,{}>{
                         onDrop={(ev:React.DragEvent)=>this.props.squareOnDrop([lineIdx,colIdx],ev)}
                         onDragOver={(ev:React.DragEvent)=>this.props.squareOnDragOver(ev)}
                         onDragEnter={(ev:React.DragEvent)=>this.props.squareOnDragEnter([lineIdx,colIdx],ev)}
-                        onTouchEnd={(ev:React.TouchEvent)=>this.props.chessOnTouchEnd([lineIdx,colIdx],ev)}
+                        onTouchEnd={(ev:React.TouchEvent)=>this.props.chessOnTouchEnd(ev)}
+                        
                         >
-
                         <ChessMan
-
                             chessManOnTouchStart={(pos:number[],event:React.TouchEvent) => this.props.chessManOnTouchStart(pos,event)}
                             chessManOnDragStart={(pos:string,ev:React.DragEvent)=>this.props.chessManOnDragStart(pos,ev)}
-                            bIsNext={bIsNext} blockWidth={blockWidth} info={squares[lineIdx][colIdx]} pos={[lineIdx,colIdx]}>
+                            selfSide={selfSide} bIsNext={bIsNext} blockWidth={blockWidth} info={squares[lineIdx][colIdx]} pos={[lineIdx,colIdx]}>
                         </ChessMan>
                     </div>
                 )
@@ -221,7 +218,6 @@ class Board extends React.Component<BoardProps,{}>{
 
         return (
             <div className="board" id="chinese-chess-board"
-                // onTouchMove={(ev:React.TouchEvent)=>this.props.squareOnTouchMove(ev)}
                 style={{width:this.props.sideWidth+"px",height:this.props.sideHeight+"px"}}>
                     <canvas id="chinese-chess-board-canvas" style={{zIndex:0}}/>
                     <div className="chess-container" style={{zIndex:1}}>

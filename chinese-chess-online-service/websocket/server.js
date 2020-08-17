@@ -3,28 +3,35 @@ const ws = require('nodejs-websocket');
 const app = require('../app');
 const server = require('http').Server(app).listen(8088);
 
+const {userIOMap} = require('./../public/javascripts/userIOMap');
 const io = require('socket.io')(server);
 
-const userIOMap = {
 
-}
+// const userIOMap = {
+
+// }
 
 io.on('connection',(socket) => {
+    console.log("connect:"+socket.id)
+    console.log(userIOMap);
+
     socket.on('userAdd',(data) => {
-        const {uName,token} = data;
-        userIOMap[uName]=socket.id;
-        userIOMap[socket.id]=uName
+        const {userName,token} = data;
+        userIOMap[userName]=socket.id;
+        userIOMap[socket.id]=userName
         console.log(userIOMap);
 
         // io.to(socket.id).emit('message','surprise');//给指定客户端发送
     })
 
     socket.on('disconnect',(reason)=>{
+        const userName = userIOMap[socket.id];
         console.log('disconnect:'+socket.id);
-        const uName = userIOMap[socket.id];
         delete userIOMap[socket.id];
-        delete userIOMap[uName];
+        delete userIOMap[userName];
     })
+
+    
     // socket.on('sendmsg', (data)=>{
     //     console.log(data)
     //     io.emit('recvmsg',data)
@@ -68,6 +75,6 @@ io.on('connection',(socket) => {
 //     return server;
 // }
 // console.log("Server")
-// const server = createServer()
+// coniost server = createServer()
 
-module.exports = {};
+module.exports = io;

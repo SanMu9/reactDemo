@@ -59,8 +59,8 @@ router.post('/registerName', function (req, res, next) {
 })
 
 router.get('/getRoomsInfo', function (req, res, next) {
+    const userName = req.body.userName;
     db.sql('select * from rooms_tb', [], function (result) {
-        console.log(result)
         res.send(result.result);
     })
 });
@@ -68,6 +68,13 @@ router.get('/getRoomsInfo', function (req, res, next) {
 router.post('/createRoom', function (req, res, next) {
     const userName = req.body.userName;
     // db.sql('insert into rooms_tb ()')
+})
+
+router.post('/getOtherUserList',function(req,res,next){
+    const userName = req.body.userName;
+    db.sql('select * from users_tb where name != ?',[userName],function(result){
+        res.send(result.result)
+    })
 })
 
 module.exports = router;

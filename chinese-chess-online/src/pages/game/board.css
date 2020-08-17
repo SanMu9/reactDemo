@@ -1,0 +1,27 @@
+.board{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+#chinese-chess-board-canvas{
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+/* .chess-container{
+    display: flex;
+    flex-direction: column-reverse;
+}
+.square-row{
+    flex-direction: row-reverse
+} */
+.square{
+    /* outline: 1px dashed #333; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    /* perspective: 200px;
+    -webkit-perspective:200px */
+}

@@ -18,7 +18,6 @@ import './App.css';
 class App extends React.Component {
     render() {
         const { token } = this.props as any;
-        console.log(token)
 
         const routes = routerMap.map((item,index)=>{
             return (
@@ -53,7 +52,6 @@ class App extends React.Component {
     }
   
     componentDidMount(){
-       
     }
     componentWillUnmount(){
         const {socket} = this.props as any;
@@ -69,19 +67,10 @@ const mapStateToProps = (state: IStoreState) => {
         socket:state.socket
     }
 }
-const mapDispatchToProps = (dispatch: Dispatch) => {
-    return {
-        getToken: () => {
-            dispatch(
-                { type: "GETTOKEN" }
-            )
-        },
-        // ioConnect:(io:SocketIOClient.Socket) => {
-        //     dispatch(
-        //         {type:"IOCONNECT",data:io}
-        //     )
-        // }
-    }
-}
+// const mapDispatchToProps = (dispatch: Dispatch) => {
+//     return {
+//         
+//     }
+// }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connect(mapStateToProps)(App);

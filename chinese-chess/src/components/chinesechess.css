@@ -10,3 +10,4 @@ html,body{
     color: #000;
     font-family: 'kaiti';
 }
+* { touch-action: pan-y; } 

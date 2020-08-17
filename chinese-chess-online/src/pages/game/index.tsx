@@ -1,5 +1,12 @@
 import React from 'react';
-import './chinesechess.css';
+
+import './index.css';
+import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
+import { AxiosResponse } from 'axios';
+import { USER,IStoreState } from '../../entity';
+
+import {getGameInfo,chessMove} from './../../api/api';
 import Board from "./board";
 
 function multidimensionArrayDeepCopy(obj:any):any{
@@ -14,31 +21,40 @@ function multidimensionArrayDeepCopy(obj:any):any{
 }
 
 interface IState {
-    winner:string | null,
-    sideWidth:number,
-    sideHeight:number,
     blockWidth:number,
     bIsNext:boolean,
-    squares:any[10][9]
-    // sideLength:number,
-    // blockWidth:number
+    squares:any[10][9],
+    sideWidth:number,
+    sideHeight:number,
+    selfSide:number,
+    winner:string | null,
+    player1:string,
+    player2:string,
+
+    gameId:string
 }
 
+interface rivalMoveParams {
+    id:string,
+    chessInitPos:number[],
+    pos:number[]
+}
 
-class Game extends React.Component<{},IState> {
-    // constructor(props:any){
-    //     super(props);
-        
-    // }
+class Game extends React.Component <{},IState> {
+
     private cWidth:number = document.documentElement.clientWidth;
     private cHeight:number = document.documentElement.clientHeight;
     private blockWidth:number = this.cWidth>this.cHeight?this.cHeight*0.8/11:this.cWidth*0.8/10;
-
+    
     readonly state:IState= {
         winner:null,
         blockWidth:this.blockWidth,
         sideWidth:this.blockWidth*10,
         sideHeight:this.blockWidth*11,
+        selfSide:1,
+        player1:"",
+        player2:"",
+        gameId:"",
         bIsNext:true,
         squares: [
             [22,23,24,25,26,25,24,23,22],
@@ -54,14 +70,71 @@ class Game extends React.Component<{},IState> {
         ]
     }
 
-    // public dragChessState = {
-    // }
     public dragChessDom:HTMLElement = document.createElement("div");
     public dragChessInitialPos:number[] = [-1,-1];//拖拽棋子的初始位置
     public dropSquareDropEffect:string = "none"//拖放位置拖放状态（是否可移动none/move）
     public posChessCanDrop:string[] = []//拖拽的棋子可以放置的位置
 
     public dragChessCopy:HTMLElement|null = null;
+
+  
+    public componentWillMount() {
+        let {socket,userName,token} = this.props as any;
+        socket.emit("userAdd",{userName,token})
+    }
+
+    public componentDidMount(){
+        window.addEventListener('resize',()=>this.resizeWindow());
+        this.getGameDetail();
+        const {socket} = this.props as any;
+        let _this = this;        
+
+        socket.on("rivalMove",(params:rivalMoveParams) => {
+            _this.rivalMove(params.chessInitPos,params.pos,params.id);
+        })
+
+    }
+
+    public componentWillUnmount() {
+        window.removeEventListener('resize',()=>this.resizeWindow());
+    }
+
+    public render(){
+        // const {cWidth,cHeight} = this.props as any;
+        const blockWidth:number = this.state.blockWidth;
+        const sideWidth:number = this.state.sideWidth;
+        const sideHeight:number = this.state.sideHeight;
+        const squares:[][] = multidimensionArrayDeepCopy(this.state.squares);
+        const bIsNext:boolean = this.state.bIsNext;
+        const winner:string|null = this.state.winner;
+        const selfSide = this.state.selfSide;
+        let text:string = bIsNext?"你的回合":"对方回合";
+
+        if(winner){
+            text = "获胜方 "+winner;
+        }
+
+        return (
+            <div id="game">
+                <p>{text}</p>
+                <Board 
+                    selfSide={selfSide}
+                    blockWidth={blockWidth}
+                    sideWidth={sideWidth}
+                    sideHeight={sideHeight}
+                    bIsNext={bIsNext}
+                    squares={squares}
+                    chessManOnTouchStart={(pos:number[],event:React.TouchEvent) => this.chessManOnTouchStart(pos,event)}
+                    squareOnTouchMove={(ev:React.TouchEvent)=>this.squareOnTouchMove(ev)}
+                    chessOnTouchEnd={(ev:React.TouchEvent)=>this.chessOnTouchEnd(ev)}
+                    squareOnDragEnter={(pos:number[],ev:React.DragEvent)=>this.squareOnDragEnter(pos,ev)}
+                    squareOnDragOver={(ev:React.DragEvent)=>this.squareOnDragOver(ev)}
+                    squareOnDrop={(pos:number[],ev:React.DragEvent)=>this.squareOnDrop(pos,ev)}
+                    chessManOnDragStart={(pos:number[],ev:React.DragEvent) => this.chessManOnDragStart(pos,ev)}>
+                </Board>
+            </div>
+        )
+    }
 
     private resizeWindow():void{
         this.cWidth = document.documentElement.clientWidth;
@@ -74,12 +147,30 @@ class Game extends React.Component<{},IState> {
         })
     }
 
-    public componentDidMount(){
-        window.addEventListener('resize',()=>this.resizeWindow());
-    }
+    public getGameDetail(){
+        var {gameId,userName,location}  = this.props as any;
+        gameId = gameId?gameId:location.state.id;
+        let _this = this;
+        getGameInfo({gameId}).then(res => {
+            if(res.data.code === 200){
+                let gameInfo = res.data.data[0];
+                // player1为黑子，player2为红子，黑子先行
+                let bIsNext = userName === gameInfo.player_next?true:false;
+                let selfSide = userName === gameInfo.player1?2:1;
+                let squares= gameInfo.step?(JSON.parse(gameInfo.step)).data:multidimensionArrayDeepCopy(_this.state.squares)
+                _this.setState({
+                    bIsNext:bIsNext,
+                    selfSide:selfSide,
+                    gameId:gameId,
+                    player2:gameInfo.player2,
+                    player1:gameInfo.player1,
+                    squares:squares
+                })
+             
+            }
 
-    public componentWillUnmount() {
-        window.removeEventListener('resize',()=>this.resizeWindow());
+        })
+
     }
 
     // 棋子初始位置
@@ -90,26 +181,22 @@ class Game extends React.Component<{},IState> {
         this.dragChessDom = ev.target as HTMLElement;
         ev.dataTransfer.effectAllowed = "move";
         this.posChessCanDrop = this.getPosChessCanDrop(this.dragChessInitialPos,this.state.squares[pos[0]][pos[1]]);
+        console.log(this.posChessCanDrop)
     }
 
     public chessManOnTouchStart(pos:number[],ev:React.TouchEvent):void{
         this.dragChessInitialPos = [pos[0],pos[1]];
         let dragDom = ev.target as HTMLElement;
-        console.log(dragDom.draggable)
         if(!dragDom.draggable)return
         this.dragChessDom = dragDom;
         let clone = this.dragChessCopy =  dragDom.cloneNode(true) as HTMLElement;
         this.dragChessCopy.style.opacity = "0";
         this.dragChessCopy.style.position = "fixed";
 
-        // dragDom.style.visibility = "hidden";
         const board = document.getElementById("chinese-chess-board") as HTMLElement;
         board.appendChild(clone);
 
-
         this.posChessCanDrop = this.getPosChessCanDrop(this.dragChessInitialPos,this.state.squares[pos[0]][pos[1]]);
-        // this.dragChessDom = ev.target as HTMLElement;
-        console.log(this.posChessCanDrop)
     }
 
     public squareOnDragOver = (ev:React.DragEvent) => {
@@ -137,17 +224,11 @@ class Game extends React.Component<{},IState> {
 
             this.dragChessCopy.style.left = x+"px";
             this.dragChessCopy.style.top = y+"px";
-            // this.dragChessCopy.style.zIndex = "3"
-
-            // console.log(x)
         }
-        // console.log(ev.targetTouches[0].target)
     }
-
 
     public squareOnDrop = (pos:number[],ev:React.DragEvent)=>{
         ev.preventDefault();
-        console.log(ev)
         // 该位置允许释放棋子
         if(this.dropSquareDropEffect ==="move"){
             // const tar:HTMLElement = ev.target as HTMLElement;
@@ -159,36 +240,58 @@ class Game extends React.Component<{},IState> {
             const chessInfo:number = squares[chessInitPos[0]][chessInitPos[1]];
             squares[chessInitPos[0]][chessInitPos[1]] = 0;
             const tarPosChess:number = squares[pos[0]][pos[1]];
-            const enemyBoss = this.state.bIsNext?16:26;
-            const enemySide = this.state.bIsNext?"黑方":"红方";
+            const enemyBoss = this.state.selfSide===2?16:26;
+            const winSide = this.state.selfSide===2?"黑方":"红方";
             squares[pos[0]][pos[1]] = chessInfo;
 
-            const winner:string|null = tarPosChess===enemyBoss?enemySide:null;
+            const winner:string|null = tarPosChess===enemyBoss?winSide:null;
+
+            const {userName} = this.props as any;
+            let params = {
+                chessInitPos,
+                pos,
+                id:dragChess.id,
+                squares:JSON.stringify({data:squares}),
+                gameId:this.state.gameId,
+                player1:this.state.player1,
+                player2:this.state.player2,
+                userName:userName,
+                winner:winner?userName:null
+            };
+            chessMove(params).then(res => {
+                console.log(res)
+            })
+            // console.log(params)
 
             this.chessMoveAnimation(dragChess,chessInitPos,pos,()=>{
+                // let bIsNext = this.state.bIsNext;
+                // if(bIsNext){
+
+                // }
+
                 this.setState({
                     squares:squares,
                     bIsNext:!this.state.bIsNext,
                     winner:winner
                 })
+
             })
 
         }
-     
 
         this.dragChessInitialPos = [-1,-1];
         this.dropSquareDropEffect = "none";
         this.posChessCanDrop = [];
     }
 
-    public chessOnTouchEnd = (pos:number[],ev:React.TouchEvent) => {
+    public chessOnTouchEnd = (ev:React.TouchEvent)=> {
         // ev.preventDefault()
-
         let ele = document.elementFromPoint(ev.changedTouches[0].pageX,ev.changedTouches[0].pageY),
             x = ele?(ele as any).dataset.col:null,
             y =  ele?(ele as any).dataset.line:null,
-            idx = this.posChessCanDrop.indexOf(y+""+x);
-        pos = [y,x];
+            idx = this.posChessCanDrop.indexOf(y+x),
+            pos = [parseInt(y),parseInt(x)];
+            
         console.log(idx)
         const board = document.getElementById("chinese-chess-board") as HTMLElement;
         if(this.dragChessCopy){
@@ -203,37 +306,72 @@ class Game extends React.Component<{},IState> {
            
             return 
         };//判断是否可移动
-    
-        // if(this.dragChessCopy){
 
-            // const tar:HTMLElement = ev.target as HTMLElement;
-            const chessInitPos:number[] = this.dragChessInitialPos;
-            // const dragChess:HTMLElement= this.dragChessDom;
-            // const parent:HTMLElement = dragChess.parentElement as HTMLElement;
+        const chessInitPos:number[] = this.dragChessInitialPos;
+        const dragChess:HTMLElement= this.dragChessDom;
+        // const parent:HTMLElement = dragChess.parentElement as HTMLElement;
 
-            const squares:any[10][9] = multidimensionArrayDeepCopy(this.state.squares);
-            const chessInfo:number = squares[chessInitPos[0]][chessInitPos[1]];
-            squares[chessInitPos[0]][chessInitPos[1]] = 0;
-            const tarPosChess:number = squares[pos[0]][pos[1]];
-            const enemyBoss = this.state.bIsNext?16:26;
-            const enemySide = this.state.bIsNext?"黑方":"红方";
-            squares[pos[0]][pos[1]] = chessInfo;
+        const squares:any[10][9] = multidimensionArrayDeepCopy(this.state.squares);
+        const chessInfo:number = squares[chessInitPos[0]][chessInitPos[1]];
+        squares[chessInitPos[0]][chessInitPos[1]] = 0;
+        const tarPosChess:number = squares[pos[0]][pos[1]];
+        const enemyBoss = this.state.selfSide===2?16:26;
+        const winSide = this.state.selfSide===2?"黑方":"红方";
+        squares[pos[0]][pos[1]] = chessInfo;
 
-            const winner:string|null = tarPosChess===enemyBoss?enemySide:null;
-            console.log(ev)
+        const winner:string|null = tarPosChess===enemyBoss?winSide:null;
 
+        const {userName} = this.props as any;
+        let params = {
+            chessInitPos,
+            pos,
+            id:dragChess.id,
+            squares:JSON.stringify({data:squares}),
+            gameId:this.state.gameId,
+            player1:this.state.player1,
+            player2:this.state.player2,
+            userName:userName,
+            winner:winner?userName:null
+        };
+        chessMove(params).then(res => {
+            console.log(res)
+        })
+        this.setState({
+            squares:squares,
+            bIsNext:!this.state.bIsNext,
+            winner:winner
+        })
+        this.dragChessInitialPos = [-1,-1];
+
+    }
+
+    /**
+     * @param chessInitPos 移动棋子的初始位置
+     * @param pos 移动棋子的目标位置
+     * @param id 移动棋子的id
+     */
+    public rivalMove =(chessInitPos:number[],pos:number[],id:string) => {
+        const dragChess:HTMLElement|null= document.getElementById(id);
+        const squares:any[10][9] = multidimensionArrayDeepCopy(this.state.squares);
+        const chessInfo:number = squares[chessInitPos[0]][chessInitPos[1]];
+        squares[chessInitPos[0]][chessInitPos[1]] = 0;
+        const tarPosChess:number = squares[pos[0]][pos[1]];
+        const selfBoss = this.state.selfSide===1?16:26;
+        const enemySide = this.state.selfSide===1?"黑方":"红方";
+        squares[pos[0]][pos[1]] = chessInfo;
+
+
+        const winner:string|null = tarPosChess===selfBoss?enemySide:null;
+
+
+        this.chessMoveAnimation(dragChess as HTMLElement,chessInitPos,pos,()=>{
             this.setState({
                 squares:squares,
-                bIsNext:!this.state.bIsNext,
+                bIsNext:true,
                 winner:winner
             })
+        })
 
-            this.dragChessInitialPos = [-1,-1];
-            
-
-        // }
-        // this.dragChessCopy = null;
-     
     }
 
     public chessMoveAnimation = (chessDom:HTMLElement,beginPos:number[],endPos:number[],callback:Function) => {
@@ -278,12 +416,12 @@ class Game extends React.Component<{},IState> {
 
     // 指定位置棋子是否为己方棋子，为敌方棋子或没有棋子返回false
     public oneOfUs = (chessInfo:number):boolean  => {
-        const side = this.state.bIsNext?2:1;
+        const side = this.state.selfSide;
         return side === Math.floor(chessInfo/10);
     }
 
     public isEnemy = (chessInfo:number):boolean => {
-        const side = this.state.bIsNext?2:1;
+        const side = this.state.selfSide;
         const chessType = Math.floor(chessInfo/10);
         return chessType!==0&&side!==chessType
     }
@@ -292,6 +430,9 @@ class Game extends React.Component<{},IState> {
         // if(bp.join("")===ep.join("")){return []}
         const dragChessType:number = chessType%10;//棋子类型
         const dragChessSide:number = Math.floor(chessType/10);//棋子方,黑方:2 红方：1
+      
+        console.log(bp)
+
         const squares:[][] = this.state.squares;
 
         switch(dragChessType){
@@ -333,10 +474,12 @@ class Game extends React.Component<{},IState> {
                             continue;
                         }
                         if(this.isEnemy(chessOnRoute)&&chessCountOnRoute===1){
+                            console.log()
                             posAllowed.push([line,i].join(""));
                             break;
                         }
                         if(chessOnRoute!==0){
+                            console.log(chessOnRoute)
                             chessCountOnRoute++;
                         }
                     }
@@ -556,45 +699,37 @@ class Game extends React.Component<{},IState> {
 
         return [];
     }
+}
 
-    // public 
-
-
-    public render() {
-        const blockWidth:number = this.state.blockWidth;
-        const sideWidth:number = this.state.sideWidth;
-        const sideHeight:number = this.state.sideHeight;
-        const squares:[][] = multidimensionArrayDeepCopy(this.state.squares);
-        const bIsNext:boolean = this.state.bIsNext;
-        const winner:string|null = this.state.winner;
-        let text:string = bIsNext?"黑方回合":"红方回合";
-
-        if(winner){
-            text = "获胜方 "+winner;
-        }
-
-        // console.log(this.state.blockWidth)
-       
-        return (
-            <div id="game">
-                <p>{text}</p>
-                <Board 
-                    blockWidth={blockWidth}
-                    sideWidth={sideWidth}
-                    sideHeight={sideHeight}
-                    bIsNext={bIsNext}
-                    squares={squares}
-                    chessOnTouchEnd={(pos:number[],ev:React.TouchEvent)=>this.chessOnTouchEnd(pos,ev)}
-                    squareOnTouchMove={(ev:React.TouchEvent)=>this.squareOnTouchMove(ev)}
-                    chessManOnTouchStart={(pos:number[],event:React.TouchEvent) => this.chessManOnTouchStart(pos,event)}
-                    squareOnDragEnter={(pos:number[],ev:React.DragEvent)=>this.squareOnDragEnter(pos,ev)}
-                    squareOnDragOver={(ev:React.DragEvent)=>this.squareOnDragOver(ev)}
-                    squareOnDrop={(pos:number[],ev:React.DragEvent)=>this.squareOnDrop(pos,ev)}
-                    chessManOnDragStart={(pos:number[],ev:React.DragEvent) => this.chessManOnDragStart(pos,ev)}>
-                </Board>
-            </div>
-        )
+const mapStateToProps = (state: IStoreState) => {
+    return {
+        userName: state.user.uName,
+        token: state.user.token,
+        status:state.user.status,
+        socket: state.socket,
+        cWidth: state.page.cWidth,
+        cHeight:state.page.cHeight,
+        gameId:state.game.gameId
     }
 }
 
-export default Game
+
+const mapDispatchToProps = (dispatch: Dispatch) => {
+
+    return {
+
+        resizePage:() => {
+            dispatch({
+                type:"SIZECHANGE"
+            })
+        }
+        // setUserList:(data:USER[]) => {
+        //     dispatch({
+        //         type: "SETLIST",
+        //         data: data
+        //     })
+        // }
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(Game);

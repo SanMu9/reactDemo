@@ -94,7 +94,7 @@ class Login extends React.Component{
                 if(result.code === 200){
                     localStorage.setItem("chineseChessUName",userName);
                     localStorage.setItem("chineseChessToken",result.token);
-                    saveToken({uName:userName,token:result.token});
+                    saveToken({uName:userName,token:result.token,status:1});
                     history.push("/")
                 }
             }

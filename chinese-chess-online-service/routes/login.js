@@ -26,7 +26,6 @@ router.post('/', function(req, res, next) {
     const token = Jwt.generateToken(data);
     
     db.sql('UPDATE users_tb SET token = ? WHERE name = ?',[token,userName],(result)=>{
-        console.log(result)
         if (result.result.affectedRows === 1) {
             res.send({ code: 200,token:token });
         } else {

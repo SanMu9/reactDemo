@@ -31,6 +31,10 @@
 .user-list-container .user-wrap .name{
     top: 0;
     opacity: 1;
+    flex-direction: column;
+}
+.user-list-container .user-wrap .name .status{
+    font-size: 10px;
 }
 .user-list-container .user-wrap .btn{
     top: 100%;

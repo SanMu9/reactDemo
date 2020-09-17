@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var db = require('./../config/db');
+
+const {userStatus} = require('./../public/javascripts/userIOMap');
+
 // var app = express();
 
 // app.get('/',)
@@ -72,8 +75,15 @@ router.post('/createRoom', function (req, res, next) {
 
 router.post('/getOtherUserList',function(req,res,next){
     const userName = req.body.userName;
+    console.log(userStatus)
     db.sql('select * from users_tb where name != ?',[userName],function(result){
-        res.send(result.result)
+        const data = result.result.map(item=>{
+            return {
+                ...item,
+                status:userStatus[item.name]?userStatus[item.name]:0
+            }
+        })
+        res.send(data)
     })
 })
 

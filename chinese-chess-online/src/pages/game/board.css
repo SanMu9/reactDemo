@@ -9,13 +9,18 @@
     left: 0;
     top: 0;
 }
-/* .chess-container{
+
+/* 为了使各方位置都显示在棋盘下方 （默认黑上红下），黑色方应用如下样式*/
+.chess-container.blackSide{
     display: flex;
     flex-direction: column-reverse;
 }
-.square-row{
+.blackSide .square-row{
     flex-direction: row-reverse
-} */
+}
+
+/* .............................................. */
+
 .square{
     /* outline: 1px dashed #333; */
     display: flex;

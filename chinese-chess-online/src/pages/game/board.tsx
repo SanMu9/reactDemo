@@ -186,7 +186,7 @@ class Board extends React.Component<BoardProps,{}>{
         const blockWidth:number = this.props.blockWidth;
         const bIsNext:boolean = this.props.bIsNext;
         const selfSide:number = this.props.selfSide;
-        console.log(squares)
+        console.log(selfSide)
         // const sideWidth:number = this.props.sideWidth;
         // const sideHeight:number = this.props.sideHeight;
         const doms:JSX.Element[] = squares.map((arr:[],lineIdx:number) => {
@@ -220,7 +220,7 @@ class Board extends React.Component<BoardProps,{}>{
             <div className="board" id="chinese-chess-board"
                 style={{width:this.props.sideWidth+"px",height:this.props.sideHeight+"px"}}>
                     <canvas id="chinese-chess-board-canvas" style={{zIndex:0}}/>
-                    <div className="chess-container" style={{zIndex:1}}>
+                    <div className={["chess-container",selfSide===2?"blackSide":null].join(" ")} style={{zIndex:1}}>
                         {doms}
                     </div>
             </div>

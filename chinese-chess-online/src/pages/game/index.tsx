@@ -376,12 +376,23 @@ class Game extends React.Component <{},IState> {
 
     public chessMoveAnimation = (chessDom:HTMLElement,beginPos:number[],endPos:number[],callback:Function) => {
         const blockWidth = this.state.blockWidth;
+        const sideHeight = this.state.sideHeight;
+        const sideWidth = this.state.sideWidth;
+        const selfSide = this.state.selfSide;
+
         let clone: HTMLElement= chessDom.cloneNode(true) as HTMLElement;
         chessDom.style.visibility = "hidden";
         // clone.classList.add("onmove");
         clone.style.position = "absolute";
-        clone.style.left = blockWidth*(beginPos[1]+1)+"px";
-        clone.style.top = blockWidth*(beginPos[0]+1)+"px";
+        /* 因各方位置都显示在棋盘下方 （默认黑上红下），黑色方和红色方根据css布局方式不同采用不同的位置策略*/
+        if(selfSide===2){
+            clone.style.left = sideWidth-blockWidth*(beginPos[1]+1)+"px";
+            clone.style.top =sideHeight-blockWidth*(beginPos[0]+1)+"px";
+        }else{
+            clone.style.left = blockWidth*(beginPos[1]+1)+"px";
+            clone.style.top = blockWidth*(beginPos[0]+1)+"px";
+        }
+      
         clone.style.transform = "translate(-50%,-50%)";
         clone.style.zIndex = "3"
         const board = document.getElementById("chinese-chess-board") as HTMLElement;
@@ -394,8 +405,18 @@ class Game extends React.Component <{},IState> {
             setTimeout(()=>{
                 clone.style.transition = "all 1s";
 
-                clone.style.left = blockWidth*(endPos[1]+1)+"px";
-                clone.style.top = blockWidth*(endPos[0]+1)+"px";
+                if(selfSide===2){
+                    clone.style.left = sideWidth-blockWidth*(endPos[1]+1)+"px";
+                    clone.style.top =sideHeight-blockWidth*(endPos[0]+1)+"px";
+                    
+                }else{
+                    clone.style.left = blockWidth*(endPos[1]+1)+"px";
+                    clone.style.top = blockWidth*(endPos[0]+1)+"px";
+                }
+
+                
+                // clone.style.left = sideWidth-blockWidth*(endPos[1]+1)+"px";
+                // clone.style.top =sideHeight-blockWidth*(endPos[0]+1)+"px";
 
                 setTimeout(()=>{
                     clone.style.transition = "all 0.3s";

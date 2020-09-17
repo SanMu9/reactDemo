@@ -238,10 +238,15 @@ class Game extends React.Component<{},IState> {
 
     public chessMoveAnimation = (chessDom:HTMLElement,beginPos:number[],endPos:number[],callback:Function) => {
         const blockWidth = this.state.blockWidth;
+        const sideHeight = this.state.sideHeight;
+        const sideWidth = this.state.sideWidth;
+
         let clone: HTMLElement= chessDom.cloneNode(true) as HTMLElement;
         chessDom.style.visibility = "hidden";
         // clone.classList.add("onmove");
         clone.style.position = "absolute";
+        // clone.style.left = sideWidth-blockWidth*(beginPos[1]+1)+"px";
+        // clone.style.top =sideHeight-blockWidth*(beginPos[0]+1)+"px";
         clone.style.left = blockWidth*(beginPos[1]+1)+"px";
         clone.style.top = blockWidth*(beginPos[0]+1)+"px";
         clone.style.transform = "translate(-50%,-50%)";
@@ -256,6 +261,8 @@ class Game extends React.Component<{},IState> {
             setTimeout(()=>{
                 clone.style.transition = "all 1s";
 
+                // clone.style.left = sideWidth-blockWidth*(endPos[1]+1)+"px";
+                // clone.style.top =sideHeight-blockWidth*(endPos[0]+1)+"px";
                 clone.style.left = blockWidth*(endPos[1]+1)+"px";
                 clone.style.top = blockWidth*(endPos[0]+1)+"px";
 

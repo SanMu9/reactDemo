@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const {userIOMap,GameMap} = require('./../public/javascripts/userIOMap');
+const {userIOMap,GameMap,userStatus} = require('./../public/javascripts/userIOMap');
 var io = require('./../websocket/server');
 var db = require('./../config/db');
 
@@ -33,7 +33,12 @@ router.post('/createGame',function(req,res,next){
       GameMap[player2] = player1;
       GameMap[player1] = player2;
 
+      userStatus[player1] = 2;
+      userStatus[player2] = 2;
+      io.emit('usersUpdate');
+
       io.to(userIOMap[player1]).emit("beginGame",{gameId:game_id,player1:player1,player2:player2});
+      
     }
     
   })

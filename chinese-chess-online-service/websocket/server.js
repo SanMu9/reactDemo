@@ -3,7 +3,7 @@ const ws = require('nodejs-websocket');
 const app = require('../app');
 const server = require('http').Server(app).listen(8088);
 
-const {userIOMap} = require('./../public/javascripts/userIOMap');
+const {userIOMap,userStatus} = require('./../public/javascripts/userIOMap');
 const io = require('socket.io')(server);
 
 
@@ -18,20 +18,22 @@ io.on('connection',(socket) => {
     socket.on('userAdd',(data) => {
         const {userName,token} = data;
         userIOMap[userName]=socket.id;
-        userIOMap[socket.id]=userName
+        userIOMap[socket.id]=userName;
+        userStatus[userName] = 1;
+        socket.broadcast.emit('usersUpdate')
         console.log(userIOMap);
-
         // io.to(socket.id).emit('message','surprise');//给指定客户端发送
     })
 
     socket.on('disconnect',(reason)=>{
+
+        io.emit('usersUpdate')
         const userName = userIOMap[socket.id];
         console.log('disconnect:'+socket.id);
+        userStatus[userName] = 0;
         delete userIOMap[socket.id];
         delete userIOMap[userName];
     })
-
-    
     // socket.on('sendmsg', (data)=>{
     //     console.log(data)
     //     io.emit('recvmsg',data)

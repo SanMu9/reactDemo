@@ -1,5 +1,5 @@
 import React from 'react'
-import {useState,useEffect} from 'react'
+import {useState,useEffect,useRef} from 'react'
 
 const friendList = [
     {id:1,name:'wang'},
@@ -14,8 +14,8 @@ const onlineStatus = {
 
 function useFriendStatus(id){
     const [isOnline,setIsOnline] = useState(null);
-    console.log(isOnline)
     useEffect(() => {
+        console.log(isOnline)
         setIsOnline(onlineStatus[id])
     },[id])
 
@@ -27,7 +27,6 @@ function useFriendStatus(id){
 function About(){
     const [selectID,setSelectID] = useState(1);
     const isOnline = useFriendStatus(selectID);
-    console.log("isOnline:"+isOnline)
     const styles = {
         status:{
             width:'10px',
@@ -37,6 +36,26 @@ function About(){
             backgroundColor:isOnline?'green':'red'
         }
     }
+
+    const [count,setCount] = useState(0);
+
+    const countRef = useRef();
+    useEffect(()=> {
+        countRef.current = count;
+    },[count])
+
+    function handleAlertClick() {
+        setTimeout(() => {
+            alert('You clicked on:' + count +'\n' + 'newest Count is:' + countRef.current)
+        },3000)
+    }
+    // useEffect(() => {
+    //     const id = setInterval(() => {
+    // //c 为最新count值
+    //         setCount(c => c+1)
+    //     },1000)
+    //     return () => clearInterval(id);
+    // },[])
 
     return (
         <div>
@@ -52,6 +71,14 @@ function About(){
                     )
                 })}
             </select>
+            <br/>
+            <p>You Clicked {count} times</p>
+            <button onClick={()=>setCount(count+1)}>Click Me</button>
+            <button onClick={handleAlertClick}>
+                Show alert
+            </button>
+            <br/>
+            {/* <h1></h1> */}
         </div>
     )
 }

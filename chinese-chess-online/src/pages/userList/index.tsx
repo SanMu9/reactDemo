@@ -23,15 +23,17 @@ class List extends React.Component {
         invitor:"",
         msg:""
     }
+    private userStatusMap = ["离线","在线","游戏中"]
 
     public render():JSX.Element {
-        console.log(this.state)
         const {userList} = this.props as any;
+        console.log(userList)
         const list = userList.map((user:USER,index:number) => {
             return (
             <div className="user-wrap" key={index}>
                 <div className="name">
                     {user.uName}
+                    <span className="status">{this.userStatusMap[user.status]}</span>
                 </div>
                 <div className="btn" onClick={()=>this.inviteUser(user.uName)}>
                     邀请
@@ -114,6 +116,10 @@ class List extends React.Component {
         console.log(this.props)
         let _this = this;
         this.getList();
+        socket.on('usersUpdate',()=>{
+            console.log("SSSS")
+            this.getList();
+        })
         socket.on("invite",(invitor:string)=> {
             _this.invitePopShow(invitor)
         });

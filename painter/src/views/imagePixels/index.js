@@ -23,6 +23,7 @@ function ImagePixels(){
     const uploadProps = {
         multiple:true,
         accept:"image/*",
+        // listType:"picture-card",
         // onChange:(info) => {
         //     // console.log(fileList)
         //     setFileList(info.fileList)
@@ -33,8 +34,8 @@ function ImagePixels(){
         onPreview:(file) => {
             selectFile(file)
         },
-        beforeUpload:(file,fileList) => {
-            setFileList([...fileList])
+        beforeUpload:(file,flist) => {
+            setFileList([...fileList,...flist])
             return false;
         },
         onRemove:file => {

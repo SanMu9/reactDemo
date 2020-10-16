@@ -8,7 +8,29 @@
 }
 .main{
     flex: 1;
-    width: 0;
+    /* width: 0; */
     height: 100%;
+    /* overflow-x: scroll; */
+    /* overflow-y: scroll; */
     overflow: auto;
+}
+
+::-webkit-scrollbar{
+    width:5px;
+    height: 5px;
+    /* background-color:rgba(0,0,0,.2); */
+    /* border-radius:8px; */
+}
+::-webkit-scrollbar-button{
+    display:none;
+}
+::-webkit-scrollbar-track{
+    display:none;
+}
+::-webkit-scrollbar-track-piece{
+    background-color:rgba(0,0,0,.2);
+}
+::-webkit-scrollbar-thumb {
+    background-color:#7f7e80;
+    border-radius:8px;
 }

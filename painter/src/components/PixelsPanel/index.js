@@ -4,6 +4,8 @@ import {useEffect} from 'react'
 import {Slider,InputNumber,Col,Row} from 'antd'
 import './index.css'
 
+import Piexl from './Pixel'
+
 
 function getObjectURL(file) {
     var url = null;
@@ -18,7 +20,7 @@ function getObjectURL(file) {
 }
 
 
-const canvasRef = React.createRef();
+// const canvasRef = React.createRef();
 const containerRef = React.createRef();
 const boxVisbleRef = React.createRef();
 const painterBoxRef = React.createRef();
@@ -35,11 +37,12 @@ const style = {
 const maxScaleVal = 2;
 
 
-function CanvasPanel(props) {
+function PixelsPanel(props) {
     
     const {fileSelected} = props;
 
     const [scale,setScale] = useState(0.75);
+    const [pixels,setPixels] = useState({data:[],width:1,height:1})
     const [containerSize,setContainerSize] = useState({width:'100%',height:'100%'})
     const [painterSize,setPainterSize] = useState({width:'1200px',height:'675px'});
  
@@ -90,23 +93,34 @@ function CanvasPanel(props) {
             width:painterW>=widthVisible?(painterW + 400) +'px':'100%',
             height:painterH>=heightVisible?(painterH + 400) +'px':'100%'
         })
-   
     }
 
-  
-    console.log("render")
-    // const 
-    
+    const pixelDoms = pixels.data.map((item,index) => {
+        let x = index%pixels.width+1,
+            y = parseInt(index/pixels.width)+1;
+        let props = {
+            x,
+            y,
+            scale,
+            bgColor:item
+        };
+        return  (
+            <Piexl key={'x'+x+'y'+y} {...props}></Piexl>
+        )
+    })
+    console.log(pixelDoms)
+    console.log('render')
 
     useEffect(() => {
         console.log('fileSelected changed')
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
+        // const canvas = canvasRef.current;
+        // const ctx = canvas.getContext("2d");
         if(fileSelected){
             let imageUrl = getObjectURL(fileSelected);
             let img = document.createElement('img');
 
-            
+            let canvas = document.createElement('canvas');
+            let ctx = canvas.getContext("2d");
 
             img.src = imageUrl;
             img.onload = () =>{
@@ -114,15 +128,30 @@ function CanvasPanel(props) {
                 canvas.height = img.height;
                 setPainterSize({width:img.width+'px',height:img.height+'px'});
                 ctx.drawImage(img,0,0);
+                let imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
+                console.log(imageData)
+
 
                 const visibleBox = boxVisbleRef.current;
                 const widthVisible = visibleBox.offsetWidth;
                 const heightVisible = visibleBox.offsetHeight;
 
+                
+                let pixelsColors = [],
+                    data = imageData.data,
+                    len = data.length;
+                    
+                for(let i=0;i<len;i+=4){
+                    pixelsColors.push('rgba('+data[i]+','+data[i+1]+','+data[i+2]+','+data[i+3]/255+')')
+                }
+                console.log(pixelsColors)
+
                 setContainerSize({
                     width:img.width*scale>widthVisible?(img.width*scale + 400) +'px':'100%',
                     height:img.height*scale>heightVisible?(img.height + 400) + 'px':"100%"
                 })
+                setPixels({data:pixelsColors,width:imageData.width,height:imageData.height})
+
             }
 
         }
@@ -158,7 +187,8 @@ function CanvasPanel(props) {
 
                 <div className="painter-container" ref={containerRef} style={containerStyle}>
                     <div className="painter-box" ref={painterBoxRef} style={painterStyle}>
-                        <canvas ref={canvasRef}></canvas>
+                        {/* <canvas ref={canvasRef}></canvas> */}
+                        {pixelDoms}
                     </div>
 
                 </div>
@@ -180,4 +210,4 @@ function CanvasPanel(props) {
     )
 }
 
-export default CanvasPanel
+export default PixelsPanel

@@ -30,7 +30,6 @@
     /* position: absolute;
     left: 40px;
     top: 40px; */
-    perspective-origin: center;
     transition: all .5s;
 }
 .painter-box canvas{
@@ -42,4 +41,7 @@
     bottom: 10px;
     left: 40px;
     width: 40%;
+}
+.pixel-item{
+    float: left;
 }

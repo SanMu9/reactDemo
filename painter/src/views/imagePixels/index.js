@@ -4,6 +4,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import './index.css'
 
 import CanvasPanel from '../../components/CanvasPanel/index';
+import PixelsPanel from '../../components/PixelsPanel/index';
 
 import {useState} from 'react'
 
@@ -59,7 +60,8 @@ function ImagePixels(){
                 </Upload>
             </Sider>
             <Content className="main">
-                <CanvasPanel {...canvasPanelProps}></CanvasPanel>
+                {/* <CanvasPanel {...canvasPanelProps}></CanvasPanel> */}
+                <PixelsPanel {...canvasPanelProps}></PixelsPanel>
             </Content>
         </Layout>
     )

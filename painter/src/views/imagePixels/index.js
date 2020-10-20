@@ -3,7 +3,7 @@ import { Layout,Upload,Button } from 'antd'
 import { UploadOutlined } from '@ant-design/icons';
 import './index.css'
 
-import CanvasPanel from '../../components/CanvasPanel/index';
+// import CanvasPanel from '../../components/CanvasPanel/index';
 import PixelsPanel from '../../components/PixelsPanel/index';
 
 import {useState} from 'react'

@@ -5,7 +5,7 @@ import {Slider,InputNumber,Col,Row} from 'antd'
 import './index.css'
 
 import Piexl from './Pixel'
-
+// 此组件使用dom渲染图片，图片分辨率不能过高，否则会导致浏览器崩溃
 
 function getObjectURL(file) {
     var url = null;
@@ -34,7 +34,7 @@ const style = {
         padding:"0 0 60px 0"
     }
 };
-const maxScaleVal = 2;
+const maxScaleVal = 32;
 
 
 function PixelsPanel(props) {
@@ -42,7 +42,7 @@ function PixelsPanel(props) {
     const {fileSelected} = props;
 
     const [scale,setScale] = useState(0.75);
-    const [pixels,setPixels] = useState({data:[],width:1,height:1})
+    const [pixels,setPixels] = useState([])
     const [containerSize,setContainerSize] = useState({width:'100%',height:'100%'})
     const [painterSize,setPainterSize] = useState({width:'1200px',height:'675px'});
  
@@ -94,21 +94,7 @@ function PixelsPanel(props) {
             height:painterH>=heightVisible?(painterH + 400) +'px':'100%'
         })
     }
-
-    const pixelDoms = pixels.data.map((item,index) => {
-        let x = index%pixels.width+1,
-            y = parseInt(index/pixels.width)+1;
-        let props = {
-            x,
-            y,
-            scale,
-            bgColor:item
-        };
-        return  (
-            <Piexl key={'x'+x+'y'+y} {...props}></Piexl>
-        )
-    })
-    console.log(pixelDoms)
+  
     console.log('render')
 
     useEffect(() => {
@@ -138,19 +124,37 @@ function PixelsPanel(props) {
 
                 
                 let pixelsColors = [],
+                    pixelDoms = [],
+                    count = 0,
                     data = imageData.data,
+                    width = imageData.width,
                     len = data.length;
+                console.log(width,imageData.height)
                     
-                for(let i=0;i<len;i+=4){
-                    pixelsColors.push('rgba('+data[i]+','+data[i+1]+','+data[i+2]+','+data[i+3]/255+')')
+                for(let i=0;i<=len-4;i+=4){
+                    let x = count%width+1,
+                        y = parseInt(count/width)+1,
+                        key = 'x'+x+'y'+y,
+                        props = {
+                            x,
+                            y,
+                            bgColor:'rgba('+data[i]+','+data[i+1]+','+data[i+2]+','+data[i+3]/255+')'
+                        }
+
+                    pixelDoms.push(
+                        (
+                            <Piexl key={key} {...props}></Piexl>
+                        )
+                    )
+                    count++;
+
                 }
-                console.log(pixelsColors)
 
                 setContainerSize({
                     width:img.width*scale>widthVisible?(img.width*scale + 400) +'px':'100%',
                     height:img.height*scale>heightVisible?(img.height + 400) + 'px':"100%"
                 })
-                setPixels({data:pixelsColors,width:imageData.width,height:imageData.height})
+                setPixels(pixelDoms)
 
             }
 
@@ -188,7 +192,7 @@ function PixelsPanel(props) {
                 <div className="painter-container" ref={containerRef} style={containerStyle}>
                     <div className="painter-box" ref={painterBoxRef} style={painterStyle}>
                         {/* <canvas ref={canvasRef}></canvas> */}
-                        {pixelDoms}
+                        {pixels}
                     </div>
 
                 </div>

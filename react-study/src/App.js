@@ -4,6 +4,7 @@ import './App.css';
 
 const Hook = lazy(() => import("./components/Hook"));
 const Error = lazy(() => import("./components/Error"));
+const Nav = lazy(()=>import("./components/Nav"))
 const UseCallback = lazy(() => import("./components/UseCallback"));
 
 
@@ -13,7 +14,7 @@ function App() {
     <Router>
       <Suspense fallback={<div>Loading...</div>}>
         <Switch>
-          <Route exact path="/" component={Error} />
+          <Route exact path="/" component={Nav} />
           <Route path="/hook" component={Hook} />
           <Route path="/usecallback" component={UseCallback} />
 

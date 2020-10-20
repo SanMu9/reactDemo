@@ -2,10 +2,10 @@
 import React from 'react'
 
 const Pixel = (props) => {
-    const {x,y,scale,bgColor} = props;
+    const {x,y,bgColor} = props;
     const style = {
-        width:scale + 'px',
-        height:scale + 'px',
+        width:'1px',
+        height:'1px',
         backgroundColor:bgColor
     }
     return (

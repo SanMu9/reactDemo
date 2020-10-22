@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
 
 const Hook = lazy(() => import("./components/Hook"));
-const Error = lazy(() => import("./components/Error"));
-const Nav = lazy(()=>import("./components/Nav"))
+// const Error = lazy(() => import("./components/Error"));
+const Nav = lazy(()=>import("./components/nav/Nav"))
 const UseCallback = lazy(() => import("./components/UseCallback"));
 
 

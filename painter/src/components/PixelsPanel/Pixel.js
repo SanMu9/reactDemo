@@ -6,10 +6,20 @@ const Pixel = (props) => {
     const style = {
         width:'1px',
         height:'1px',
+        display:'block',
         backgroundColor:bgColor
     }
     return (
-        <div className='pixel-item' data-x={x} data-y={y} style={style}></div>
+        <span className='pixel-item' data-x={x} data-y={y} style={style}></span>
+    )
+}
+
+export const PixelRow = (props) => {
+    const {pixels} = props;
+    return (
+        <div className="pixels-row">
+            {pixels}
+        </div>
     )
 }
 

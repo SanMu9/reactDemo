@@ -3,8 +3,8 @@ import { Layout,Upload,Button } from 'antd'
 import { UploadOutlined } from '@ant-design/icons';
 import './index.css'
 
-// import CanvasPanel from '../../components/CanvasPanel/index';
-import PixelsPanel from '../../components/PixelsPanel/index';
+import CanvasPanel from '../../components/CanvasPanel/index2';
+// import PixelsPanel from '../../components/PixelsPanel/index2';
 
 import {useState} from 'react'
 
@@ -60,8 +60,8 @@ function ImagePixels(){
                 </Upload>
             </Sider>
             <Content className="main">
-                {/* <CanvasPanel {...canvasPanelProps}></CanvasPanel> */}
-                <PixelsPanel {...canvasPanelProps}></PixelsPanel>
+                <CanvasPanel {...canvasPanelProps}></CanvasPanel>
+                {/* <PixelsPanel {...canvasPanelProps}></PixelsPanel> */}
             </Content>
         </Layout>
     )

@@ -1,7 +1,7 @@
 const express = require("express");
 const ws = require('nodejs-websocket');
 const app = require('../app');
-const server = require('http').Server(app).listen(8088);
+const server = require('http').createServer().listen(8088);
 
 const {userIOMap,userStatus} = require('./../public/javascripts/userIOMap');
 const io = require('socket.io')(server);
@@ -10,9 +10,13 @@ const io = require('socket.io')(server);
 // const userIOMap = {
 
 // }
+// console.log(app)
+// console.log(express())
+
 
 io.on('connection',(socket) => {
     console.log("connect:"+socket.id)
+
     console.log(userIOMap);
 
     socket.on('userAdd',(data) => {

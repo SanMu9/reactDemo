@@ -9,9 +9,11 @@ const userDefaultState:USER= {
     token:localStorage.getItem('chineseChessToken'),
     status:0
 }
+// console.log(window.location)
+// let url = 'ws://'+window.location.host+'/ws';
 
-const socketDefaultState:SocketIOClient.Socket|null = io('ws://172.26.5.110:8088/')
-// const socketDefaultState:SocketIOClient.Socket|null = io('ws://172.26.5.110:8088/')
+// const socketDefaultState:SocketIOClient.Socket|null = io(url);
+const socketDefaultState:SocketIOClient.Socket|null = io('ws://localhost:8088/')
 
 
 const userReducer = (state=userDefaultState,action = {type:'USERADD',data:userDefaultState}) => {

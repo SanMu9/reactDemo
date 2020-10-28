@@ -111,7 +111,7 @@ class Game extends React.Component <{},IState> {
         let text:string = bIsNext?"你的回合":"对方回合";
 
         if(winner){
-            text = "获胜方 "+winner;
+            // text = "获胜方 "+winner;
         }
 
         return (
@@ -132,6 +132,10 @@ class Game extends React.Component <{},IState> {
                     squareOnDrop={(pos:number[],ev:React.DragEvent)=>this.squareOnDrop(pos,ev)}
                     chessManOnDragStart={(pos:number[],ev:React.DragEvent) => this.chessManOnDragStart(pos,ev)}>
                 </Board>
+
+                <div className="result-wrap" style={{display:winner?'flex':'none'}}>
+                    <span className={['result-txt',winner?'active':null].join(' ')}>{bIsNext?'败':'胜'}</span>
+                </div>
             </div>
         )
     }

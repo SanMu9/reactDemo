@@ -10,7 +10,7 @@ const userDefaultState:USER= {
     status:0
 }
 
-const socketDefaultState:SocketIOClient.Socket|null = io('ws://192.168.0.15:8088/')
+const socketDefaultState:SocketIOClient.Socket|null = io('ws://172.26.5.110:8088/')
 // const socketDefaultState:SocketIOClient.Socket|null = io('ws://172.26.5.110:8088/')
 
 

@@ -70,4 +70,15 @@ router.post('/chessMove',function(req,res,next){
   
 })
 
+router.post('/gameover',function(req,res,next){
+  const {player1,player2} = req.body;
+
+  userStatus[player1] = 1;
+  userStatus[player2] = 1;
+  delete  GameMap[player2];
+  delete  GameMap[player1];
+  res.send({code:200,data:'游戏结束'})
+
+})
+
 module.exports = router;

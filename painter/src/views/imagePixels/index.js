@@ -18,38 +18,36 @@ const {Sider,Content} = Layout;
 
 function ImagePixels(){
 
-    const [fileList,setFileList] = useState([])
-    const [fileSelected,selectFile] = useState(null)
+    const [fileList,setFileList] = useState([]);
+    const [fileSelected,selectFile] = useState(null);
+    const [removedId,setRemovedId] = useState(null)
 
     const uploadProps = {
         multiple:true,
         accept:"image/*",
-        // listType:"picture-card",
-        // onChange:(info) => {
-        //     // console.log(fileList)
-        //     setFileList(info.fileList)
-        // },
-        // customRequest:() => {
-        //     return true
-        // },
+   
         onPreview:(file) => {
             selectFile(file)
         },
         beforeUpload:(file,flist) => {
             setFileList([...fileList,...flist])
+            selectFile(file)
             return false;
         },
         onRemove:file => {
             const index = fileList.indexOf(file);
             const newFileList = fileList.slice();
             newFileList.splice(index,1);
+
+            setRemovedId(file.uid)
+            selectFile(null)
             setFileList(newFileList);
         },
         fileList
     }
-
     const canvasPanelProps = {
-        fileSelected
+        fileSelected,
+        removedId
     }
 
     return (

@@ -81,6 +81,7 @@ class List extends React.Component {
     }
     public componentWillMount() {
         let {socket,userName,token} = this.props as any;
+        console.log('userAdd:'+userName+'____'+'token:'+token)
         socket.emit("userAdd",{userName,token})
     }
 
@@ -113,7 +114,8 @@ class List extends React.Component {
 
     public componentDidMount() {
         const {socket,setGame,history} = this.props as any;
-        console.log(this.props)
+        // console.log(this.props)
+        // console.log()
         let _this = this;
         this.getList();
         socket.on('usersUpdate',()=>{

@@ -32,6 +32,8 @@ router.post('/createGame',function(req,res,next){
       res.send({code:200,data:game_id})
       GameMap[player2] = player1;
       GameMap[player1] = player2;
+      console.log(userStatus);
+      console.log(userIOMap)
 
       userStatus[player1] = 2;
       userStatus[player2] = 2;

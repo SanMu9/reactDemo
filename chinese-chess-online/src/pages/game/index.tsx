@@ -80,7 +80,7 @@ class Game extends React.Component <{},IState> {
   
     public componentWillMount() {
         let {socket,userName,token} = this.props as any;
-        socket.emit("userAdd",{userName,token})
+        // socket.emit("userAdd",{userName,token})
     }
 
     public componentDidMount(){

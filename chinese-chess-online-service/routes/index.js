@@ -75,6 +75,7 @@ router.post('/createRoom', function (req, res, next) {
 
 router.post('/getOtherUserList',function(req,res,next){
     const userName = req.body.userName;
+    console.log('getOtherUserList')
     console.log(userStatus)
     db.sql('select * from users_tb where name != ?',[userName],function(result){
         const data = result.result.map(item=>{

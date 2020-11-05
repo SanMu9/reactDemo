@@ -13,7 +13,12 @@ const userDefaultState:USER= {
 // let url = 'ws://'+window.location.host+'/ws';
 
 // const socketDefaultState:SocketIOClient.Socket|null = io(url);
-const socketDefaultState:SocketIOClient.Socket|null = io('ws://localhost:8088/')
+      console.log('location.host:'+window.location.host)
+// let url = 'ws://'+window.location.host+'/socket.io';
+
+// const socketDefaultState:SocketIOClient.Socket|null = io(url);
+
+const socketDefaultState:SocketIOClient.Socket|null = io('ws://172.26.5.110:8088/')
 
 
 const userReducer = (state=userDefaultState,action = {type:'USERADD',data:userDefaultState}) => {

@@ -17,15 +17,14 @@ const io = require('socket.io')(server);
 io.on('connection',(socket) => {
     console.log("connect:"+socket.id)
 
-    console.log(userIOMap);
-
     socket.on('userAdd',(data) => {
         const {userName,token} = data;
         userIOMap[userName]=socket.id;
         userIOMap[socket.id]=userName;
         userStatus[userName] = 1;
         socket.broadcast.emit('usersUpdate')
-        console.log(userIOMap);
+        console.log('useAdd:'+userName);
+        // console.log(userIOMap);
         // io.to(socket.id).emit('message','surprise');//给指定客户端发送
     })
 
@@ -33,7 +32,7 @@ io.on('connection',(socket) => {
 
         io.emit('usersUpdate')
         const userName = userIOMap[socket.id];
-        console.log('disconnect:'+socket.id);
+        console.log('disconnect:'+userName);
         userStatus[userName] = 0;
         delete userIOMap[socket.id];
         delete userIOMap[userName];

@@ -16,7 +16,7 @@
 }
 .result-wrap .result-txt{
     opacity: 0;
-    font-size: 50%;
+    font-size: 48px;
     font-weight: bold;
     transition: all 1s;
     transform: translateY(-100%);

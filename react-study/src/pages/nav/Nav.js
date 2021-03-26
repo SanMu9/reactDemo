@@ -3,7 +3,7 @@ import React from 'react';
 // const style = require('./Nav.css')
 // console.log(style)
 import styles from './Nav.module.css';
-import {BrowserRouter as Router, Redirect,Route,Link,useHistory} from 'react-router-dom';
+import {BrowserRouter as Router, Redirect,Route,Link} from 'react-router-dom';
 
 import ChildI from './ChildI'
 import ChildII from './/ChildII'

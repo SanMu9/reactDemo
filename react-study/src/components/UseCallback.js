@@ -6,10 +6,13 @@ function MeasureExample() {
     const [height,setHeight] = useState(0);
 
     const measuredRef = useCallback(node => {
+        console.log(node)
         if(node !== null){
             setHeight(node.getBoundingClientRect().height);
         }
     },[]);
+
+    console.log(measuredRef)
 
     return (
         <div>
